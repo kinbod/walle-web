@@ -1,0 +1,10 @@
+language: python
+sudo: enabled
+python:
+  - "2.7"
+install:
+  - echo "#install#"
+before_script:
+  - echo "#before_script#"
+script:
+  - echo "#script#"
