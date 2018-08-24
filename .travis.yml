@@ -21,7 +21,7 @@ install:
   # Pre-requirements sanity test (again, resembles pure, non-dev install
   # environment.) Avoids e.g. spec's 'six' from gumming up our attempts to
   # import our vendorized 'six'.
-  - pip install -r requirements/dev.conf
+  - pip install -r requirements/dev.txt
   - pip list --format=columns
 before_script:
   - echo "#before_script#"
