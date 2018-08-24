@@ -29,3 +29,6 @@ script:
   - echo "#script#"
   - export FLASK_APP=autoapp.py
   - python -m flask test
+notifications:
+    on_success: never
+    on_failure: always
