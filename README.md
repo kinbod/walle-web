@@ -3,6 +3,8 @@
 walle-web.io a deployment kit
 
 
+[![Build Status](https://travis-ci.org/meolu/walle-web.svg?branch=development)](https://travis-ci.org/meolu/walle-web)
+
 Quickstart
 ----------
 
