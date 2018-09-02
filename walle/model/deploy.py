@@ -100,6 +100,7 @@ class TaskModel(SurrogatePK, Model):
         task = data.to_json()
         project = ProjectModel().get_by_id(task['project_id']).to_dict()
         task['project_name'] = project['name'] if project else u'未知项目'
+        task['project_info'] = project
         return task
 
     def add(self, *args, **kwargs):
@@ -159,6 +160,7 @@ class TaskModel(SurrogatePK, Model):
 class TaskRecordModel(db.Model):
     # 表的名字:
     __tablename__ = 'task_record'
+    current_time = datetime.now()
 
     # 表的结构:
     id = db.Column(Integer, primary_key=True, autoincrement=True)
@@ -170,6 +172,8 @@ class TaskRecordModel(db.Model):
     command = db.Column(String(200))
     success = db.Column(String(2000))
     error = db.Column(String(2000))
+    created_at = db.Column(DateTime, default=current_time)
+    updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)
 
     def save_record(self, stage, sequence, user_id, task_id, status, command, success, error):
         record = TaskRecordModel(stage=stage, sequence=sequence, user_id=user_id,
@@ -177,6 +181,26 @@ class TaskRecordModel(db.Model):
                             success=success, error=error)
         db.session.add(record)
         return db.session.commit()
+
+    def fetch(self, task_id):
+        data = self.query.filter_by(task_id=task_id).order_by('id desc').all()
+        return [p.to_json() for p in data]
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'stage': self.stage,
+            'sequence': self.sequence,
+            'user_id': self.user_id,
+            'task_id': self.task_id,
+            'status': self.status,
+            'command': self.command,
+            'success': self.success,
+            'error': self.error,
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
+        }
+
 
 
 # 环境级别

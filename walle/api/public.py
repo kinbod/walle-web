@@ -9,12 +9,14 @@
 """
 
 import os
-
 from flask import request
-from werkzeug.utils import secure_filename
-from walle.model.user import UserModel
-from walle.model.user import AccessModel
 from walle.api.api import ApiResource
+from walle.model.user import AccessModel
+from walle.model.user import UserModel
+from walle.model.deploy import TaskRecordModel
+from walle.service import emails
+from walle.service.waller import Waller
+from werkzeug.utils import secure_filename
 
 
 class PublicAPI(ApiResource):
@@ -26,6 +28,10 @@ class PublicAPI(ApiResource):
         """
         if method == 'menu':
             return self.menu()
+        elif method == 'mail':
+            return self.mail()
+        elif method == 'walle':
+            return self.walless()
 
     def post(self, method):
         """
@@ -56,3 +62,21 @@ class PublicAPI(ApiResource):
         return self.render_json(data={
             'avarter': fname,
         })
+
+    def mail(self):
+        ret = 'x'
+        ret = emails.send_email('wushuiyong@renrenche.com', 'email from service@walle-web.io', 'xxxxxxx', 'yyyyyyy')
+        return self.render_json(data={
+            'avarter': 'emails.send_email',
+            'done': ret,
+        })
+
+    def walless(self):
+        wi = Waller(12)
+        ret = wi.walle_deploy()
+        record = TaskRecordModel().fetch(12)
+        return self.render_json(data={
+            'command': ret,
+            'record': record,
+        })
+

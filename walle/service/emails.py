@@ -10,10 +10,10 @@ import socket
 
 from flask import current_app, render_template
 from flask import url_for
-from flask_mail import Message
 
-from walle import mail
-from walle.common import tokens
+from walle.service.extensions import mail
+from flask_mail import Message
+from walle.service import tokens
 
 
 def _render_email(filename, **kwargs):
@@ -32,7 +32,6 @@ def _render_email(filename, **kwargs):
 
 def send_email(recipient, subject, html_message, text_message):
     """ Send email from default sender to 'recipient' """
-
     # Make sure that Flask-Mail has been initialized
     mail_engine = mail
     if not mail_engine:

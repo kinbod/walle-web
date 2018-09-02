@@ -6,7 +6,7 @@
     :created time: 2017-06-11 15:40:38
     :author: wushuiyong@walle-web.io
 """
-from flask.ext.login import current_user
+from flask_login import current_user
 import logging
 
 class Access:

@@ -5,6 +5,8 @@ import sys
 from flask import Flask, render_template
 from flask_restful import Api
 
+import logging, os
+from logging.handlers import  RotatingFileHandler
 from walle import commands
 from walle.api import access as AccessAPI
 from walle.api import api as BaseAPI
@@ -18,9 +20,9 @@ from walle.api import server as ServerAPI
 from walle.api import task as TaskAPI
 from walle.api import user as UserAPI
 from walle.config.settings import ProdConfig
-from walle.service.extensions import bcrypt, csrf_protect, db, migrate
-from walle.service.extensions import login_manager
 from walle.model.user import UserModel
+from walle.service.extensions import bcrypt, csrf_protect, db, migrate
+from walle.service.extensions import login_manager, mail
 
 
 def create_app(config_object=ProdConfig):
@@ -35,6 +37,7 @@ def create_app(config_object=ProdConfig):
     register_errorhandlers(app)
     register_shellcontext(app)
     register_commands(app)
+    register_logging(app)
 
     reload(sys)
     sys.setdefaultencoding('utf-8')
@@ -48,6 +51,7 @@ def register_extensions(app):
     csrf_protect.init_app(app)
     login_manager.init_app(app)
     migrate.init_app(app, db)
+    mail.init_app(app)
     return None
 
 
@@ -103,3 +107,56 @@ def register_commands(app):
     app.cli.add_command(commands.lint)
     app.cli.add_command(commands.clean)
     app.cli.add_command(commands.urls)
+
+
+
+def register_logging(app):
+
+    # email errors to the administrators
+    import logging
+    from logging.handlers import RotatingFileHandler
+    # Formatter
+    formatter = logging.Formatter(
+        '%(asctime)s %(levelname)s %(pathname)s %(lineno)s %(module)s.%(funcName)s %(message)s')
+
+
+    # FileHandler Info
+    file_handler_info = RotatingFileHandler(filename='/Users/wushuiyong/workspace/meolu/walle_develop/info.log')
+    file_handler_info.setFormatter(formatter)
+    file_handler_info.setLevel(logging.INFO)
+    info_filter = InfoFilter()
+    file_handler_info.addFilter(info_filter)
+    app.logger.addHandler(file_handler_info)
+
+    # FileHandler Error
+    file_handler_error = RotatingFileHandler(filename='/Users/wushuiyong/workspace/meolu/walle_develop/error.log')
+    file_handler_error.setFormatter(formatter)
+    file_handler_error.setLevel(logging.ERROR)
+    app.logger.addHandler(file_handler_error)
+
+    # app.logger.info('infoooooooooooooo')
+    # app.logger.error('errorrrrrrrrrrrrrrrrr')
+    # app.logger.error('errorrrrrrrrrrrrrrrrr')
+    # app.logger.error('errorrrrrrrrrrrrrrrrr')
+    # app.logger.error('errorrrrrrrrrrrrrrrrr')
+    # app.logger.error('errorrrrrrrrrrrrrrrrr')
+    # app.logger.error('errorrrrrrrrrrrrrrrrr')
+    # app.logger.error('errorrrrrrrrrrrrrrrrr')
+    # app.logger.error('errorrrrrrrrrrrrrrrrr')
+    # app.logger.error('errorrrrrrrrrrrrrrrrr')
+    # app.logger.error('errorrrrrrrrrrrrrrrrr')
+
+
+class InfoFilter(logging.Filter):
+    def filter(self, record):
+        """only use INFO
+        筛选, 只需要 INFO 级别的log
+        :param record:
+        :return:
+        """
+        if logging.INFO <= record.levelno < logging.ERROR:
+            # 已经是INFO级别了
+            # 然后利用父类, 返回 1
+            return 1
+        else:
+            return 0

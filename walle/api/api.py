@@ -9,8 +9,7 @@
 import logging
 
 from flask import jsonify, abort
-from flask.ext.login import login_required
-from flask.ext.login import current_user
+from flask_login import login_required
 from flask_restful import Resource
 from walle.service.rbac.access import Access as AccessRbac
 from walle.model.user import load_user
