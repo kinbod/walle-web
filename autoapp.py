@@ -8,7 +8,7 @@ from walle.config.settings import DevConfig, TestConfig, ProdConfig
 
 CONFIG = DevConfig if get_debug_flag(default=True) else ProdConfig
 
-if 2 in sys.argv and sys.argv[2] == 'test':
+if len(sys.argv) > 2 and sys.argv[2] == 'test':
     CONFIG = TestConfig
 
 app = create_app(CONFIG)
