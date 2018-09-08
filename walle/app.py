@@ -131,7 +131,7 @@ def register_logging(app):
             '%(asctime)s %(levelname)s %(pathname)s %(lineno)s %(module)s.%(funcName)s %(message)s')
 
     # FileHandler Info
-    file_handler_info = RotatingFileHandler(filename=app.config.LOG_PATH_INFO)
+    file_handler_info = RotatingFileHandler(filename=app.config['LOG_PATH_INFO'])
     file_handler_info.setFormatter(formatter)
     file_handler_info.setLevel(logging.INFO)
     info_filter = InfoFilter()
@@ -139,7 +139,7 @@ def register_logging(app):
     app.logger.addHandler(file_handler_info)
 
     # FileHandler Error
-    file_handler_error = RotatingFileHandler(filename=app.config.LOG_PATH_ERROR)
+    file_handler_error = RotatingFileHandler(filename=app.config['LOG_PATH_ERROR'])
     file_handler_error.setFormatter(formatter)
     file_handler_error.setLevel(logging.ERROR)
     app.logger.addHandler(file_handler_error)
