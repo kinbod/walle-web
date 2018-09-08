@@ -26,7 +26,7 @@ class ProjectForm(Form):
 
     target_user = TextField('target_user', [validators.Length(min=1, max=50)])
     target_root = TextField('target_root', [validators.Length(min=1, max=200)])
-    target_library = TextField('target_library', [validators.Length(min=1, max=200)])
+    target_releases = TextField('target_releases', [validators.Length(min=1, max=200)])
 
     task_vars = TextField('task_vars', [validators.Length(min=1)])
     prev_deploy = TextField('prev_deploy', [validators.Length(min=1)])
@@ -62,7 +62,7 @@ class ProjectForm(Form):
 
             'target_user': self.target_user.data if self.target_user.data else '',
             'target_root': self.target_root.data if self.target_root.data else '',
-            'target_library': self.target_library.data if self.target_library.data else '',
+            'target_releases': self.target_releases.data if self.target_releases.data else '',
 
             'task_vars': self.task_vars.data if self.task_vars.data else '',
             'prev_deploy': self.prev_deploy.data if self.prev_deploy.data else '',

@@ -7,6 +7,5 @@
 # @Description:
 ###################################################################
 source venv/bin/activate
-export FLASK_APP=autoapp.py
 export FLASK_DEBUG=1
-python -m flask run
+python autoapp.py

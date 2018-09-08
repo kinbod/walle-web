@@ -170,14 +170,16 @@ class TaskRecordModel(db.Model):
     task_id = db.Column(Integer)
     status = db.Column(Integer)
     command = db.Column(String(200))
+    host = db.Column(String(200))
+    user = db.Column(String(200))
     success = db.Column(String(2000))
     error = db.Column(String(2000))
     created_at = db.Column(DateTime, default=current_time)
     updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)
 
-    def save_record(self, stage, sequence, user_id, task_id, status, command, success, error):
+    def save_record(self, stage, sequence, user_id, task_id, status, host, user, command, success=None, error=None):
         record = TaskRecordModel(stage=stage, sequence=sequence, user_id=user_id,
-                            task_id=task_id, status=status, command=command,
+                            task_id=task_id, status=status, host=host, user=user, command=command,
                             success=success, error=error)
         db.session.add(record)
         return db.session.commit()
@@ -194,6 +196,8 @@ class TaskRecordModel(db.Model):
             'user_id': self.user_id,
             'task_id': self.task_id,
             'status': self.status,
+            'host': self.host,
+            'user': self.user,
             'command': self.command,
             'success': self.success,
             'error': self.error,
@@ -388,7 +392,7 @@ class ProjectModel(SurrogatePK, Model):
     excludes = db.Column(Text)
     target_user = db.Column(String(50))
     target_root = db.Column(String(200))
-    target_library = db.Column(String(200))
+    target_releases = db.Column(String(200))
     server_ids = db.Column(Text)
     task_vars = db.Column(Text)
     prev_deploy = db.Column(Text)
@@ -487,7 +491,7 @@ class ProjectModel(SurrogatePK, Model):
             'excludes': self.excludes,
             'target_user': self.target_user,
             'target_root': self.target_root,
-            'target_library': self.target_library,
+            'target_releases': self.target_releases,
             'server_ids': self.server_ids,
             'task_vars': self.task_vars,
             'prev_deploy': self.prev_deploy,

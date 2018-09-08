@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 """The app module, containing the app factory function."""
+import logging
 import sys
 
 from flask import Flask, render_template
 from flask_restful import Api
-
-import logging, os
-from logging.handlers import  RotatingFileHandler
+from tornado.ioloop import IOLoop
+from tornado.web import Application, FallbackHandler
+from tornado.wsgi import WSGIContainer
 from walle import commands
 from walle.api import access as AccessAPI
 from walle.api import api as BaseAPI
+from walle.api import deploy as DeployAPI
 from walle.api import environment as EnvironmentAPI
 from walle.api import group as GroupAPI
 from walle.api import passport as PassportAPI
@@ -23,6 +25,11 @@ from walle.config.settings import ProdConfig
 from walle.model.user import UserModel
 from walle.service.extensions import bcrypt, csrf_protect, db, migrate
 from walle.service.extensions import login_manager, mail
+from walle.service.websocket import WSHandler
+
+
+# TODO 添加到这,刚对单测有影响
+# app = Flask(__name__.split('.')[0])
 
 
 def create_app(config_object=ProdConfig):
@@ -38,6 +45,10 @@ def create_app(config_object=ProdConfig):
     register_shellcontext(app)
     register_commands(app)
     register_logging(app)
+
+    # 测试环境跑单测失败
+    if not app.config['TESTING']:
+        register_websocket(app)
 
     reload(sys)
     sys.setdefaultencoding('utf-8')
@@ -60,6 +71,7 @@ def register_blueprints(app):
     api = Api(app)
     api.add_resource(BaseAPI.Base, '/', endpoint='root')
     api.add_resource(PublicAPI.PublicAPI, '/api/public/<string:method>', endpoint='public')
+    api.add_resource(DeployAPI.DeployAPI, '/api/deploy/', '/api/deploy/<int:task_id>', endpoint='deploy')
     api.add_resource(AccessAPI.AccessAPI, '/api/access/', '/api/access/<int:access_id>', endpoint='access')
     api.add_resource(RoleAPI.RoleAPI, '/api/role/', '/api/role/<int:role_id>', endpoint='role')
     api.add_resource(GroupAPI.GroupAPI, '/api/group/', '/api/group/<int:group_id>', endpoint='group')
@@ -109,16 +121,14 @@ def register_commands(app):
     app.cli.add_command(commands.urls)
 
 
-
 def register_logging(app):
-
+    # TODO https://blog.csdn.net/zwxiaoliu/article/details/80890136
     # email errors to the administrators
     import logging
     from logging.handlers import RotatingFileHandler
     # Formatter
     formatter = logging.Formatter(
-        '%(asctime)s %(levelname)s %(pathname)s %(lineno)s %(module)s.%(funcName)s %(message)s')
-
+            '%(asctime)s %(levelname)s %(pathname)s %(lineno)s %(module)s.%(funcName)s %(message)s')
 
     # FileHandler Info
     file_handler_info = RotatingFileHandler(filename='/Users/wushuiyong/workspace/meolu/walle_develop/info.log')
@@ -134,17 +144,19 @@ def register_logging(app):
     file_handler_error.setLevel(logging.ERROR)
     app.logger.addHandler(file_handler_error)
 
-    # app.logger.info('infoooooooooooooo')
-    # app.logger.error('errorrrrrrrrrrrrrrrrr')
-    # app.logger.error('errorrrrrrrrrrrrrrrrr')
-    # app.logger.error('errorrrrrrrrrrrrrrrrr')
-    # app.logger.error('errorrrrrrrrrrrrrrrrr')
-    # app.logger.error('errorrrrrrrrrrrrrrrrr')
-    # app.logger.error('errorrrrrrrrrrrrrrrrr')
-    # app.logger.error('errorrrrrrrrrrrrrrrrr')
-    # app.logger.error('errorrrrrrrrrrrrrrrrr')
-    # app.logger.error('errorrrrrrrrrrrrrrrrr')
-    # app.logger.error('errorrrrrrrrrrrrrrrrr')
+
+def register_websocket(app):
+    settings = {'debug': True}
+    wsgi_app = WSGIContainer(app)
+
+    application = Application([
+        (r'/websocket', WSHandler),
+        (r'.*', FallbackHandler, dict(fallback=wsgi_app))
+    ], **settings)
+
+    application.listen(5000)
+    IOLoop.instance().start()
+    pass
 
 
 class InfoFilter(logging.Filter):
@@ -160,3 +172,9 @@ class InfoFilter(logging.Filter):
             return 1
         else:
             return 0
+
+# # TODO optimize
+# @app.route('/websocket/index')
+# def index():
+#
+#     return render_template('websocket.html')

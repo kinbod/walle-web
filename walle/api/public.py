@@ -11,11 +11,12 @@
 import os
 from flask import request
 from walle.api.api import ApiResource
+from walle.model.deploy import TaskRecordModel
 from walle.model.user import AccessModel
 from walle.model.user import UserModel
-from walle.model.deploy import TaskRecordModel
 from walle.service import emails
-from walle.service.waller import Waller
+from walle.service.deployer import Deployer
+from walle.service.websocket import WSHandler
 from werkzeug.utils import secure_filename
 
 
@@ -30,8 +31,18 @@ class PublicAPI(ApiResource):
             return self.menu()
         elif method == 'mail':
             return self.mail()
-        elif method == 'walle':
-            return self.walless()
+        elif method == 'websocket':
+            import time
+            time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+            cmd = request.args.get('cmd', ' command')
+
+            self.walle(12)
+            WSHandler.send_updates('%s %s' % (time, cmd))
+            return self.render_json(data={
+                'command': 'xxx',
+                'record': 'xxx',
+            })
+            # return render_template('websocket.html')
 
     def post(self, method):
         """
@@ -71,12 +82,12 @@ class PublicAPI(ApiResource):
             'done': ret,
         })
 
-    def walless(self):
-        wi = Waller(12)
+    def walle(self, task_id):
+
+        wi = Deployer(task_id)
         ret = wi.walle_deploy()
-        record = TaskRecordModel().fetch(12)
+        record = TaskRecordModel().fetch(task_id)
         return self.render_json(data={
             'command': ret,
             'record': record,
         })
-

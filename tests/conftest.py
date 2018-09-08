@@ -15,10 +15,6 @@ def app():
     """An application for the tests."""
     _app = create_app(TestConfig)
     # _app.config['LOGIN_DISABLED'] = True
-    f = open('run.log', 'w')
-    f.write('==========\n')
-    f.write(str(_app.login_manager._login_disabled) + '\n')
-    f.write('==========\n')
     _app.login_manager.init_app(_app)
     ctx = _app.test_request_context()
     ctx.push()
