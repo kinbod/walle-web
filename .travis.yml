@@ -25,6 +25,7 @@ install:
   - pip list --format=columns
 before_script:
   - echo "#before_script#"
+  - mkdir -p /tmp/walle/{logs,library,webroot,releases}
 script:
   - echo "#script#"
   - export FLASK_APP=autoapp.py
