@@ -31,7 +31,7 @@ flask db migrate
 flask db upgrade
 
 # 修改数据库连接（自己找下,小小地考验下）
-vi settings.py
+vi walle/config/settings.py
 
 
 # 运行（内含Flask的一些配置）
