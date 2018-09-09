@@ -43,25 +43,21 @@ class Deployer:
     dir_codebase = '/tmp/walle/codebase/'
     dir_codebase_project = dir_codebase + project_name
 
-    # dir_release  = '/home/wushuiyong/walle/release'
-    # dir_webroot  = '/home/wushuiyong/walle/webroot'
 
     # 定义远程机器
     # env.hosts = ['172.16.0.231', '172.16.0.177']
-    # env.user = 'wushuiyong'
 
     dir_release = None
     dir_webroot = None
 
     connections, success, errors = {}, {}, {}
     release_version_tar, release_version = None, None
-
-    # TODO user需要配置
-    local = Waller('127.0.0.1', user='wushuiyong')
-
-    websocket = None
+    local, websocket = None, None
 
     def __init__(self, task_id=None, websocket=None):
+        self.local = Waller(host=current_app.config.get('LOCAL_SERVER_HOST'),
+                   user=current_app.config.get('LOCAL_SERVER_USER'),
+                   port=current_app.config.get('LOCAL_SERVER_PORT'))
         self.TaskRecord = TaskModel.TaskRecordModel()
         if websocket:
             websocket.send_updates(__name__)

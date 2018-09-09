@@ -21,7 +21,9 @@ from walle.api import role as RoleAPI
 from walle.api import server as ServerAPI
 from walle.api import task as TaskAPI
 from walle.api import user as UserAPI
-from walle.config.settings import ProdConfig
+from walle.config.settings_dev import DevConfig
+from walle.config.settings_test import TestConfig
+from walle.config.settings_prod import ProdConfig
 from walle.model.user import UserModel
 from walle.service.extensions import bcrypt, csrf_protect, db, migrate
 from walle.service.extensions import login_manager, mail
