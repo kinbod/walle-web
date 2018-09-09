@@ -33,13 +33,21 @@ class Waller(Connection):
             current_app.logger.info(message)
             return result
         except Exception, e:
+            #current_app.logger.exception(e)
+            #return None
             # TODO 貌似可能的异常有很多种，需要分层才能完美解决 something wrong without e.result
             TaskRecordModel().save_record(stage=wenv['stage'], sequence=wenv['sequence'], user_id=wenv['user_id'],
                                           task_id=wenv['task_id'], status=1, host=self.host, user=self.user,
                                           command=command, success='', error='e.result')
-            message = 'task_id=%d, host:%s command:%s, status=1, reason:%s, result:%s, args:%s' % (
-                wenv['task_id'], self.host, command, e.reason, e.result, e.args
-            )
+            if hasattr(e, 'resean') and hasattr(e, 'result'):
+                message = 'task_id=%s, host:%s command:%s, status=1, reason:%s, result:%s' % (
+                    wenv['task_id'], self.host, command, e.reason, e.result
+                )
+            else:
+                message = 'task_id=%s, host:%s command:%s, status=1, message:%s' % (
+                    wenv['task_id'], self.host, command, e.message
+                )
+                
             wenv['websocket'].send_updates(message)
             current_app.logger.error(message)
 

@@ -29,7 +29,7 @@ from walle.service.websocket import WSHandler
 
 
 # TODO 添加到这,刚对单测有影响
-# app = Flask(__name__.split('.')[0])
+app = Flask(__name__.split('.')[0])
 
 
 def create_app(config_object=ProdConfig):
@@ -37,7 +37,7 @@ def create_app(config_object=ProdConfig):
 
     :param config_object: The configuration object to use.
     """
-    app = Flask(__name__.split('.')[0])
+#    app = Flask(__name__.split('.')[0])
     app.config.from_object(config_object)
     register_extensions(app)
     register_blueprints(app)
@@ -150,7 +150,7 @@ def register_websocket(app):
     wsgi_app = WSGIContainer(app)
 
     application = Application([
-        (r'/websocket', WSHandler),
+        (r'/websocket/console', WSHandler),
         (r'.*', FallbackHandler, dict(fallback=wsgi_app))
     ], **settings)
 
@@ -173,8 +173,8 @@ class InfoFilter(logging.Filter):
         else:
             return 0
 
-# # TODO optimize
-# @app.route('/websocket/index')
-# def index():
-#
-#     return render_template('websocket.html')
+ # TODO optimize
+@app.route('/demo/websocket')
+def index():
+
+    return render_template('websocket.html')
