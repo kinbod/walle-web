@@ -15,7 +15,7 @@ from walle.model.database import SurrogatePK, db, relationship, Model
 from walle.model.tag import TagModel
 from sqlalchemy.orm import aliased
 from walle.service.rbac.access import Access as AccessRbac
-import logging
+from flask import current_app
 
 
 class UserModel(UserMixin, SurrogatePK, Model):
@@ -103,17 +103,6 @@ class UserModel(UserMixin, SurrogatePK, Model):
         role = RoleModel.query.get(role_id)
         access_ids = role.access_ids.split(',')
 
-        logging.error('=============')
-        # logging.error(AccessModel.query.get(12).name_en)
-        #
-        # logging.error(dir(db.session\
-        #     .query(controller.name_en, controller.name_cn,
-        #            action.name_cn, action.name_cn) \
-        #     .outerjoin(action, action.pid == controller.id) \
-        #     .filter(module.type == AccessModel.type_module) \
-        #     .filter(controller.id.in_(access_ids)) \
-        #     .filter(action.id.in_(access_ids))))
-
         data = db.session\
             .query(controller.name_en, controller.name_cn,
                    action.name_en, action.name_cn) \
@@ -122,19 +111,7 @@ class UserModel(UserMixin, SurrogatePK, Model):
             .filter(controller.id.in_(access_ids)) \
             .filter(action.id.in_(access_ids)) \
             .all()
-        # s = []
-        # for c_en, c_cn, a_en, a_cn in data:
-        #     logging.error(type(c_en))
-        #     logging.error(type(c_en.decode()))
-        #     logging.error(c_en)
-        #     logging.error(type(a_en))
-        #     logging.error(a_en)
-        #     s.append(AccessRbac.resource(a_en, str(c_en)))
-        #
-        # return s
-        # s = [AccessRbac.resource(str(a_en), str(c_en)) for c_en, c_cn, a_en, a_cn in data if c_en and a_en]
-        # logging.error(s)
-        # return s
+
 
         return [AccessRbac.resource(a_en, c_en) for c_en, c_cn, a_en, a_cn in data if c_en and a_en]
 
@@ -167,6 +144,21 @@ class UserModel(UserMixin, SurrogatePK, Model):
         data = query.order_by('id desc').offset(int(size) * int(page)).limit(size).all()
         user_list = [p.to_json() for p in data]
         return user_list, count
+
+    def fetch_by_uid(self, uids=None):
+        """
+        获取分页列表
+        :param page:
+        :param size:
+        :return:
+        """
+        query = UserModel.query
+        if uids:
+            query = query.filter(UserModel.id.in_(uids))
+        data = query.order_by('id desc').all()
+        current_app.logger.info(data)
+        user_list = [p.to_json() for p in data]
+        return user_list
 
     def to_json(self):
         return {
@@ -219,7 +211,6 @@ class AccessModel(SurrogatePK, Model):
             .order_by('sequence asc') \
             .all()
         for item in query:
-            logging.error(str(item.to_json()))
             if item.type == self.type_module:
                 data[item.id] = {
                     'title': item.name_cn,
@@ -279,7 +270,6 @@ class AccessModel(SurrogatePK, Model):
                     'title': a_name,
                 })
         menus = []
-        logging.error(type(menus_module))
         for m_id, m_info in menus_module.items():
             for c_id, c_info in m_info['sub_menu'].items():
                 m_info['sub_menu'][c_id]['sub_menu'] = menus_controller[c_id]
@@ -500,7 +490,13 @@ class GroupModel(SurrogatePK, Model):
         for group_info in groups:
             user_ids.append(group_info.user_id)
 
-        tag['user_ids'] = user_ids
+        current_app.logger.info(user_ids)
+        user_model = UserModel()
+        user_info = user_model.fetch_by_uid(uids=set(user_ids))
+        current_app.logger.info(user_info)
+
+
+        tag['user_info'] = user_info
         tag['users'] = len(user_ids)
         return tag
 
@@ -545,7 +541,6 @@ class GroupModel(SurrogatePK, Model):
 
 @login_manager.user_loader
 def load_user(user_id):
-    logging.error(user_id)
     user = UserModel.query.get(user_id)
     role = RoleModel().item(user.role_id)
     access = UserModel().fetch_access_list_by_role_id(user.role_id)

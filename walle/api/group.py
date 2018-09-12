@@ -10,7 +10,7 @@
 
 from flask import request
 from walle.form.group import GroupForm
-from walle.model.user import GroupModel
+from walle.model.user import GroupModel, UserModel
 from walle.model.tag import TagModel
 from walle.api.api import SecurityResource
 
@@ -75,14 +75,12 @@ class GroupAPI(SecurityResource):
         if not group_model:
             return self.render_json(code=-1)
 
-        f = open('run.log', 'w')
-        # f.write(str(group_model) + '\n')
-        user_ids = []
-        for user_info in group_model.users:
-            user_ids.append(user_info.user_id)
+        user_model = UserModel()
+        user_info = user_model.fetch_by_uid(uids=group_model.users)
+
         group_info = group_model.to_dict()
-        group_info['user_ids'] = user_ids
-        group_info['users'] = len(user_ids)
+        group_info['user_info'] = user_info
+        group_info['users'] = len(user_info)
         group_info['group_name'] = group_info['name']
         group_info['group_id'] = group_info['id']
         return self.render_json(data=group_info)
