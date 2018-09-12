@@ -17,7 +17,6 @@ class Config(object):
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
-
     LOCAL_SERVER_HOST = '127.0.0.1'
     LOCAL_SERVER_USER = 'wushuiyong'
     LOCAL_SERVER_PORT = 22
