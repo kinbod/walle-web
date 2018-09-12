@@ -41,3 +41,5 @@ class DevConfig(Config):
     LOCAL_SERVER_HOST = '127.0.0.1'
     LOCAL_SERVER_USER = 'wushuiyong'
     LOCAL_SERVER_PORT = 22
+
+    SQLALCHEMY_ECHO = True
