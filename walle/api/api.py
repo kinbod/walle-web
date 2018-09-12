@@ -47,13 +47,13 @@ class SecurityResource(ApiResource):
     controller = None
     action = None
 
-    @login_required
+    #@login_required
     def get(self, *args, **kwargs):
         self.action = 'get'
 
         return self.validator()
 
-    @login_required
+    #@login_required
     def delete(self, *args, **kwargs):
         self.action = 'delete'
         is_allow = AccessRbac.is_allow(action=self.action, controller=self.controller)
@@ -63,7 +63,7 @@ class SecurityResource(ApiResource):
             pass
         pass
 
-    @login_required
+    #@login_required
     def put(self, *args, **kwargs):
         self.action = 'put'
         is_allow = AccessRbac.is_allow(action=self.action, controller=self.controller)
@@ -73,7 +73,7 @@ class SecurityResource(ApiResource):
             pass
         pass
 
-    @login_required
+    #@login_required
     def post(self, *args, **kwargs):
         """
         # @login_required

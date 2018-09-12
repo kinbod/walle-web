@@ -17,6 +17,10 @@ class Waller(Connection):
 
     def run(self, command, wenv=None, sudo=False, **kwargs):
         try:
+            message = 'task_id=%s, host:%s command:%s' % (
+                wenv['task_id'], self.host, command
+            )
+            current_app.logger.info(message)
             if sudo:
                 result = super(Waller, self).sudo(command, pty=True, **kwargs)
             else:
