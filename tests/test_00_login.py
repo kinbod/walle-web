@@ -6,7 +6,8 @@ import pytest
 
 from utils import *
 from walle.model.user import UserModel
-
+from copy import deepcopy
+from test_00_base import user_data_login
 
 @pytest.mark.usefixtures('db')
 class TestApiPassport:
@@ -15,12 +16,8 @@ class TestApiPassport:
 
     user_id = {}
 
-    user_data = {
-        'email': u'wushuiyong@walle-web.io',
-        'password': u'wu123shuiyong',
-    }
+    user_data = deepcopy(user_data_login)
 
-    user_name = u'wushuiyong@walle-web.io'
 
     def test_fetch(self):
         f = open('run.log', 'w')
@@ -29,7 +26,6 @@ class TestApiPassport:
 
     def test_login(self, user, testapp, client, db):
         """create successful."""
-
 
         resp = client.post('%s/login' % (self.uri_prefix), data=self.user_data)
 

@@ -5,7 +5,9 @@ import types
 import urllib
 import pytest
 from utils import *
-
+from test_03_api_user import user_data
+from test_00_base import user_data_login
+from copy import deepcopy
 
 @pytest.mark.usefixtures('db')
 class TestApiPassport:
@@ -14,10 +16,8 @@ class TestApiPassport:
 
     user_id = {}
 
-    user_data = {
-        'email': u'test01@walle-web.io',
-        'password': u'walle987&^*',
-    }
+    user_data = user_data
+    user_data_login = deepcopy(user_data_login)
 
     user_name = u'test01@walle-web.io'
 
@@ -36,9 +36,9 @@ class TestApiPassport:
         response_success(resp)
         compare_req_resp(response, resp)
 
-        resp = client.post('%s/login' % (self.uri_prefix), data=self.user_data)
+        resp = client.post('%s/login' % (self.uri_prefix), data=self.user_data_login)
 
         response_success(resp)
 
-        del self.user_data['password']
-        compare_req_resp(self.user_data, resp)
+        del self.user_data_login['password']
+        compare_req_resp(self.user_data_login, resp)

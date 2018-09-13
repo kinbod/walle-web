@@ -4,7 +4,7 @@
 import pytest
 
 from walle.app import create_app
-from walle.config.settings import TestConfig
+from walle.config.settings_test import TestConfig
 from walle.model.database import db as _db
 from webtest import TestApp
 from .factories import UserFactory

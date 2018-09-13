@@ -18,6 +18,7 @@ from wtforms.validators import Regexp
 from walle.model.user import RoleModel
 from walle.model.user import UserModel
 from flask import current_app
+import re
 
 class UserForm(FlaskForm):
     pass
@@ -26,8 +27,8 @@ class UserForm(FlaskForm):
 class RegistrationForm(Form):
     email = TextField('Email Address', [validators.email()])
     password = PasswordField('Password', [validators.Length(min=6, max=35),
-                                          Regexp(r'(?=\d{0,}[a-zA-Z])(?=[a-zA-Z]{0,}\d)[a-zA-Z0-9]{6,}',
-                                                 message='密码强度不足')])
+                                          validators.Regexp(regex="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}",
+                              message='密码至少6个字符，至少1个大写字母，1个小写字母，1个数字')])
 
     role_id = TextField('Password', [validators.Length(min=1, max=10)])
     username = TextField('Username', [validators.Length(min=1, max=50)])
@@ -42,9 +43,7 @@ class RegistrationForm(Form):
 
 
 class UserUpdateForm(Form):
-    password = PasswordField('Password', [validators.Length(min=0, max=35),
-                                          validators.Regexp(regex="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}",
-                              message='密码至少8个字符，至少1个大写字母，1个小写字母，1个数字')])
+    password = PasswordField('Password', [])
     username = TextField('username', [validators.Length(min=1, max=50)])
     role_id = TextField('role_id', [validators.Length(min=1, max=10)])
 
@@ -53,10 +52,12 @@ class UserUpdateForm(Form):
         if not RoleModel.query.filter_by(id=field.data).first():
             raise ValidationError('角色id不存在')
 
+    def validate_password(self, field):
+        if field.data and not re.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}", field.data):
+            raise ValidationError('密码至少6个字符，至少1个大写字母，1个小写字母，1个数字')
+
 
 class LoginForm(Form):
     email = TextField('Email Address', [validators.Length(min=6, max=35),
                                         Regexp(r'^(.+)@(.+)\.(.+)', message='邮箱格式不正确')])
-    password = PasswordField('Password', [validators.Length(min=6, max=35),
-                                          Regexp(r'(?=\d{0,}[a-zA-Z])(?=[a-zA-Z]{0,}\d)[a-zA-Z0-9]{6,}',
-                                                 message='密码强度不足')])
+    password = PasswordField('Password', [validators.Length(min=6, max=35)])

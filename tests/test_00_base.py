@@ -2,11 +2,17 @@
 """Model unit tests."""
 
 import pytest
-from werkzeug.security import generate_password_hash
-
 from walle.model.user import AccessModel
 from walle.model.user import RoleModel
 from walle.model.user import UserModel
+from werkzeug.security import generate_password_hash
+from copy import deepcopy
+user_data_login = {
+    'username': u'wushuiyong',
+    'email': u'wushuiyong@walle-web.io',
+    'password': u'WU123shuiyong',
+    'role_id': 1,
+}
 
 
 @pytest.mark.usefixtures('db')
@@ -512,19 +518,18 @@ class TestAccess:
 class TestRole:
     def test_add(self):
         role = RoleModel(
-                name=u'研发', access_ids=u'1,2,3,11,12,13,14,15,16,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124'
+                name=u'研发',
+                access_ids=u'1,2,3,11,12,13,14,15,16,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124'
         )
         role.save()
 
 
 class TestUser:
+    user_data_login = deepcopy(user_data_login)
     def test_add(self):
-        password = generate_password_hash(u'wu123shuiyong')
-        user = UserModel(email=u'wushuiyong@walle-web.io',
-                         username=u'wushuiyong',
-                         password=password,
-                         role_id=1
-                         )
+
+        self.user_data_login['password'] = generate_password_hash(user_data_login['password'])
+        user = UserModel(**self.user_data_login)
         user.save()
 
         # class TestUser:

@@ -496,6 +496,7 @@ class GroupModel(SurrogatePK, Model):
         current_app.logger.info(user_info)
 
 
+        tag['user_ids'] = user_ids
         tag['user_info'] = user_info
         tag['users'] = len(user_ids)
         return tag

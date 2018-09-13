@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
 """Test Apis."""
-from flask import json
-import types
 import urllib
+
 import pytest
+from flask import current_app
 from utils import *
+
+user_data = {
+    'email': u'test01@walle-web.io',
+    'password': u'Walle987',
+    'role_id': 1,
+    'username': u'测试用户',
+}
 
 
 @pytest.mark.usefixtures('db')
@@ -14,32 +21,39 @@ class TestApiUser:
 
     user_id = {}
 
-    user_data = {
-        'email': u'test01@walle-web.io',
-        'password': u'walle987&^*',
-        'role_id': 1,
-        'username': u'测试用户',
-    }
+    user_data = user_data
 
     user_name_2 = u'Tester'
 
+    user_data_error = {
+        'email': u'user_error@walle-web.io',
+        'password': u'walle99',
+        'role_id': 1,
+        'username': u'Tester',
+    }
+
     user_data_2 = {
         'email': u'test02@walle-web.io',
-        'password': u'walle987&^*',
+        'password': u'Walle99999',
         'role_id': 1,
         'username': u'Tester',
     }
 
     user_data_remove = {
         'email': u'test03@walle-web.io',
-        'password': u'walle987&^*',
+        'password': u'Walle987&^*',
         'role_id': 1,
         'username': u'test_remove',
     }
 
     def test_create(self, user, testapp, client, db):
         """create successful."""
-        # 1.create another role
+
+        # 1.error
+        resp = client.post('%s/' % (self.uri_prefix), data=self.user_data_error)
+        response_error(resp)
+
+        # 2.create another role
         resp = client.post('%s/' % (self.uri_prefix), data=self.user_data)
 
         response_success(resp)
@@ -48,7 +62,7 @@ class TestApiUser:
         compare_req_resp(self.user_data, resp)
         self.user_data['id'] = resp_json(resp)['data']['id']
 
-        # 2.create another role
+        # 3.create another role
         resp = client.post('%s/' % (self.uri_prefix), data=self.user_data_2)
 
         response_success(resp)
@@ -102,9 +116,11 @@ class TestApiUser:
 
     def test_get_update(self, user, testapp, client):
         """Login successful."""
-        # 1.update
+
+        # 2.update
         user_data_2 = self.user_data_2
         user_data_2['username'] = 'Tester_edit'
+        current_app.logger.error(user_data_2)
         resp = client.put('%s/%d' % (self.uri_prefix, self.user_data_2['id']), data=user_data_2)
 
         response_success(resp)

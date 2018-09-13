@@ -14,7 +14,7 @@ class DevConfig(Config):
     WTF_CSRF_ENABLED = False
     DB_PATH = os.path.join(Config.PROJECT_ROOT, DB_NAME)
     # SQLALCHEMY_DATABASE_URI = 'sqlite:///{0}'.format(DB_PATH)
-    SQLALCHEMY_DATABASE_URI = 'mysql://root:@localhost/walle_python'
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:whoiam@localhost/walle_python'
     DEBUG_TB_ENABLED = True
     ASSETS_DEBUG = True  # Don't bundle/minify static assets
     CACHE_TYPE = 'simple'  # Can be "memcached", "redis", etc.
@@ -26,7 +26,7 @@ class DevConfig(Config):
     MAIL_USE_TLS = False
     MAIL_DEFAULT_SENDER = 'service@walle-web.io'
     MAIL_USERNAME = 'service@walle-web.io'
-    MAIL_PASSWORD = ''
+    MAIL_PASSWORD = 'Ki9y&3U82'
 
     LOG_PATH = os.path.join(Config.PROJECT_ROOT, 'logs')
     LOG_PATH_ERROR = os.path.join(LOG_PATH, 'error.log')
