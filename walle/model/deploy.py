@@ -263,7 +263,6 @@ class EnvironmentModel(db.Model):
     def update(self, env_name, status, env_id=None):
         # todo permission_ids need to be formated and checked
         role = EnvironmentModel.query.filter_by(id=self.id).first()
-        logging.error(role)
         role.name = env_name
         role.status = status
 

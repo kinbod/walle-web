@@ -21,6 +21,7 @@ class TagModel(SurrogatePK, Model):
     id = db.Column(Integer, primary_key=True, autoincrement=True)
     name = db.Column(String(30))
     label = db.Column(String(30))
+    label_id = db.Column(Integer)
     # users = db.relationship('Group', backref='group', lazy='dynamic')
     created_at = db.Column(DateTime, default=current_time)
     updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)

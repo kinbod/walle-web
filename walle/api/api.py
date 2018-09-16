@@ -6,7 +6,6 @@
     :created time: 2017-06-14 16:00:23
     :author: wushuiyong@walle-web.io
 """
-import logging
 
 from flask import jsonify, abort
 from flask_login import login_required

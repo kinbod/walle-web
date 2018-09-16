@@ -8,7 +8,6 @@
     :author: wushuiyong@walle-web.io
 """
 
-import logging
 
 from flask import request, abort
 from flask_login import current_user
@@ -28,7 +27,6 @@ class PassportAPI(ApiResource):
 
         :return:
         """
-        logging.error('======== logout ========')
 
         if method in self.action:
             self_method = getattr(self, method.lower(), None)
@@ -54,6 +52,5 @@ class PassportAPI(ApiResource):
         return self.render_json(code=-1, data=form.errors)
 
     def logout(self):
-        logging.error('======== logout ========')
         logout_user()
         return self.render_json()

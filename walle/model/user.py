@@ -156,7 +156,7 @@ class UserModel(UserMixin, SurrogatePK, Model):
         if uids:
             query = query.filter(UserModel.id.in_(uids))
         data = query.order_by('id desc').all()
-        current_app.logger.info(data)
+        # current_app.logger.info(data)
         user_list = [p.to_json() for p in data]
         return user_list
 
@@ -493,7 +493,7 @@ class GroupModel(SurrogatePK, Model):
         current_app.logger.info(user_ids)
         user_model = UserModel()
         user_info = user_model.fetch_by_uid(uids=set(user_ids))
-        current_app.logger.info(user_info)
+        # current_app.logger.info(user_info)
 
 
         tag['user_ids'] = user_ids
@@ -545,7 +545,6 @@ def load_user(user_id):
     user = UserModel.query.get(user_id)
     role = RoleModel().item(user.role_id)
     access = UserModel().fetch_access_list_by_role_id(user.role_id)
-    logging.error(access)
     # logging.error(RoleModel.query.get(user.role_id).access_ids)
     # logging.error(role['access_ids'].split(','))
     # logging.error(UserModel.query.get(user_id))
