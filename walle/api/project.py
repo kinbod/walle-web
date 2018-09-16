@@ -57,7 +57,7 @@ class ProjectAPI(SecurityResource):
 
     def post(self):
         """
-        create a environment
+        create a project
         /environment/
 
         :return:
