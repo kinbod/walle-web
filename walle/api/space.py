@@ -15,7 +15,6 @@ from walle.model.deploy import SpaceModel
 
 class SpaceAPI(SecurityResource):
 
-    @SecurityResource.is_master
     def get(self, space_id=None):
         """
         fetch space list or one item
