@@ -21,6 +21,7 @@ from walle.api import role as RoleAPI
 from walle.api import server as ServerAPI
 from walle.api import task as TaskAPI
 from walle.api import user as UserAPI
+from walle.api import space as SpaceAPI
 from walle.config.settings_dev import DevConfig
 from walle.config.settings_test import TestConfig
 from walle.config.settings_prod import ProdConfig
@@ -73,6 +74,7 @@ def register_blueprints(app):
     api = Api(app)
     api.add_resource(BaseAPI.Base, '/', endpoint='root')
     api.add_resource(PublicAPI.PublicAPI, '/api/public/<string:method>', endpoint='public')
+    api.add_resource(SpaceAPI.SpaceAPI, '/api/space/', '/api/space/<int:space_id>', endpoint='space')
     api.add_resource(DeployAPI.DeployAPI, '/api/deploy/', '/api/deploy/<int:task_id>', endpoint='deploy')
     api.add_resource(AccessAPI.AccessAPI, '/api/access/', '/api/access/<int:access_id>', endpoint='access')
     api.add_resource(RoleAPI.RoleAPI, '/api/role/', '/api/role/<int:role_id>', endpoint='role')

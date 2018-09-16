@@ -54,7 +54,7 @@ class ProjectForm(Form):
     def form2dict(self):
         return {
             'name': self.name.data if self.name.data else '',
-            # todo g.uid
+            # TODO g.uid
             'user_id': 1,
             'environment_id': self.environment_id.data if self.environment_id.data else '',
             'excludes': self.excludes.data if self.excludes.data else '',

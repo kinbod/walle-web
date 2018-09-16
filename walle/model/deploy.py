@@ -4,22 +4,15 @@
 # @Created Time : 日  1/ 1 23:43:12 2017
 # @Description:
 
-from sqlalchemy import Column, String, Integer, create_engine, Text, DateTime, desc, or_
-
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import current_user
-from werkzeug.security import check_password_hash, generate_password_hash
-from flask_login import UserMixin
-from pickle import dump
+from sqlalchemy import String, Integer, Text, DateTime
 
 # from flask_cache import Cache
 from datetime import datetime
 
-from walle.model.database import Column, SurrogatePK, db, reference_col, relationship, Model
+from walle.model.database import SurrogatePK, db, Model
+
 
 # from walle.service.rbac import access as rbac
-from sqlalchemy.orm import aliased
-import logging
 
 
 # 上线单
@@ -179,8 +172,8 @@ class TaskRecordModel(db.Model):
 
     def save_record(self, stage, sequence, user_id, task_id, status, host, user, command, success=None, error=None):
         record = TaskRecordModel(stage=stage, sequence=sequence, user_id=user_id,
-                            task_id=task_id, status=status, host=host, user=user, command=command,
-                            success=success, error=error)
+                                 task_id=task_id, status=status, host=host, user=user, command=command,
+                                 success=success, error=error)
         db.session.add(record)
         return db.session.commit()
 
@@ -204,7 +197,6 @@ class TaskRecordModel(db.Model):
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
         }
-
 
 
 # 环境级别
@@ -505,6 +497,92 @@ class ProjectModel(SurrogatePK, Model):
             'repo_password': self.repo_password,
             'repo_mode': self.repo_mode,
             'repo_type': self.repo_type,
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
+        }
+
+
+# 项目配置表
+class SpaceModel(SurrogatePK, Model):
+    # 表的名字:
+    __tablename__ = 'space'
+    current_time = datetime.now()
+    status_close = 0
+    status_open = 1
+
+    # 表的结构:
+    id = db.Column(Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(Integer)
+    name = db.Column(String(100))
+    status = db.Column(Integer)
+
+    created_at = db.Column(DateTime, default=current_time)
+    updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)
+
+    def list(self, page=0, size=10, kw=None):
+        """
+        获取分页列表
+        :param page:
+        :param size:
+        :return:
+        """
+        query = self.query
+        if kw:
+            query = query.filter(SpaceModel.name.like('%' + kw + '%'))
+        count = query.count()
+        data = query.order_by('id desc').offset(int(size) * int(page)).limit(size).all()
+        list = [p.to_json() for p in data]
+        return list, count
+
+    def item(self, id=None):
+        """
+        获取单条记录
+        :param role_id:
+        :return:
+        """
+        id = id if id else self.id
+        data = self.query.filter_by(id=id).first()
+
+        if not data:
+            return []
+
+        data = data.to_json()
+
+        return data
+
+    def add(self, *args, **kwargs):
+        # todo permission_ids need to be formated and checked
+        data = dict(*args)
+        space = SpaceModel(**data)
+
+        db.session.add(space)
+        db.session.commit()
+        self.id = space.id
+        return self.id
+
+    def update(self, *args, **kwargs):
+        # todo permission_ids need to be formated and checked
+        # a new type to update a model
+
+        update_data = dict(*args)
+        return super(SpaceModel, self).update(**update_data)
+
+    def remove(self, space_id=None):
+        """
+
+        :param space_id:
+        :return:
+        """
+        space_id = space_id if space_id else self.id
+        SpaceModel.query.filter_by(id=space_id).update({'status': self.status_close})
+        return db.session.commit()
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'name': self.name,
+            'status': self.status,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
         }
