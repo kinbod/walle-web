@@ -397,6 +397,8 @@ class ProjectModel(SurrogatePK, Model):
     repo_password = db.Column(String(50))
     repo_mode = db.Column(String(50))
     repo_type = db.Column(String(10))
+    notice_type = db.Column(String(10))
+    notice_hook = db.Column(Text)
 
     created_at = db.Column(DateTime, default=current_time)
     updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)
@@ -446,8 +448,6 @@ class ProjectModel(SurrogatePK, Model):
     def add(self, *args, **kwargs):
         # todo permission_ids need to be formated and checked
         data = dict(*args)
-        f = open('run.log', 'w')
-        f.write(str(data))
         project = ProjectModel(**data)
 
         db.session.add(project)
@@ -497,92 +497,54 @@ class ProjectModel(SurrogatePK, Model):
             'repo_password': self.repo_password,
             'repo_mode': self.repo_mode,
             'repo_type': self.repo_type,
+            'notice_type': self.notice_type,
+            'notice_hook': self.notice_hook,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
         }
 
-
-# 项目配置表
-class SpaceModel(SurrogatePK, Model):
+class TagModel(SurrogatePK, Model):
     # 表的名字:
-    __tablename__ = 'space'
+    __tablename__ = 'tag'
+
     current_time = datetime.now()
-    status_close = 0
-    status_open = 1
 
     # 表的结构:
     id = db.Column(Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(Integer)
-    name = db.Column(String(100))
-    status = db.Column(Integer)
-
+    name = db.Column(String(30))
+    label = db.Column(String(30))
+    label_id = db.Column(Integer, default=0)
+    # users = db.relationship('Group', backref='group', lazy='dynamic')
     created_at = db.Column(DateTime, default=current_time)
     updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)
 
-    def list(self, page=0, size=10, kw=None):
-        """
-        获取分页列表
-        :param page:
-        :param size:
-        :return:
-        """
-        query = self.query
-        if kw:
-            query = query.filter(SpaceModel.name.like('%' + kw + '%'))
-        count = query.count()
-        data = query.order_by('id desc').offset(int(size) * int(page)).limit(size).all()
-        list = [p.to_json() for p in data]
-        return list, count
+    def list(self):
+        data = TagModel.query.filter_by(id=1).first()
+        # # return data.tag.count('*').to_json()
+        # # print(data)
+        # return []
+        return data.to_json() if data else []
 
-    def item(self, id=None):
+    def remove(self, tag_id):
         """
-        获取单条记录
+
         :param role_id:
         :return:
         """
-        id = id if id else self.id
-        data = self.query.filter_by(id=id).first()
-
-        if not data:
-            return []
-
-        data = data.to_json()
-
-        return data
-
-    def add(self, *args, **kwargs):
-        # todo permission_ids need to be formated and checked
-        data = dict(*args)
-        space = SpaceModel(**data)
-
-        db.session.add(space)
-        db.session.commit()
-        self.id = space.id
-        return self.id
-
-    def update(self, *args, **kwargs):
-        # todo permission_ids need to be formated and checked
-        # a new type to update a model
-
-        update_data = dict(*args)
-        return super(SpaceModel, self).update(**update_data)
-
-    def remove(self, space_id=None):
-        """
-
-        :param space_id:
-        :return:
-        """
-        space_id = space_id if space_id else self.id
-        SpaceModel.query.filter_by(id=space_id).update({'status': self.status_close})
+        TagModel.query.filter_by(id=tag_id).delete()
         return db.session.commit()
 
     def to_json(self):
+        # user_ids = []
+        # for user in self.users.all():
+        #     user_ids.append(user.user_id)
         return {
             'id': self.id,
-            'user_id': self.user_id,
-            'name': self.name,
-            'status': self.status,
+            'group_id': self.id,
+            'group_name': self.name,
+            # 'users': user_ids,
+            # 'user_ids': user_ids,
+            'label': self.label,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
         }

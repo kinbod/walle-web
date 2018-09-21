@@ -20,6 +20,7 @@ from walle.model.deploy import ProjectModel
 class ProjectForm(Form):
     name = TextField('name', [validators.Length(min=1, max=100)])
     environment_id = TextField('environment_id', [validators.Length(min=1, max=10)])
+    status = TextField('status', [validators.Length(min=1, max=10)])
     excludes = TextField('excludes', [validators.Length(min=1)])
     server_ids = TextField('server_ids', [validators.Length(min=1)])
     keep_version_num = TextField('keep_version_num', [validators.Length(min=1, max=2)])
@@ -39,6 +40,8 @@ class ProjectForm(Form):
     repo_username = TextField('repo_username', [validators.Length(min=0, max=50)])
     repo_password = TextField('repo_password', [validators.Length(min=0, max=50)])
     repo_mode = TextField('repo_mode', [validators.Length(min=1, max=50)])
+    notice_type = TextField('notice_type', [validators.Length(min=1, max=10)])
+    notice_hook = TextField('notice_hook', [validators.Length(min=1)])
 
     id = None
 
@@ -56,6 +59,8 @@ class ProjectForm(Form):
             'name': self.name.data if self.name.data else '',
             # TODO g.uid
             'user_id': 1,
+
+            'status': self.status.data if self.status.data else 0,
             'environment_id': self.environment_id.data if self.environment_id.data else '',
             'excludes': self.excludes.data if self.excludes.data else '',
             'server_ids': self.server_ids.data if self.server_ids.data else '',
@@ -76,4 +81,7 @@ class ProjectForm(Form):
             'repo_username': self.repo_username.data if self.repo_username.data else '',
             'repo_password': self.repo_password.data if self.repo_password.data else '',
             'repo_mode': self.repo_mode.data if self.repo_mode.data else '',
+
+            'notice_type': self.notice_type.data if self.notice_type.data else '',
+            'notice_hook': self.notice_hook.data if self.notice_hook.data else '',
         }
