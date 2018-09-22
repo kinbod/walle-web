@@ -11,7 +11,7 @@
 from flask import request
 from walle.api.api import SecurityResource
 from walle.form.space import SpaceForm
-from walle.model.deploy import SpaceModel
+from walle.model.user import SpaceModel
 
 class SpaceAPI(SecurityResource):
 

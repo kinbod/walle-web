@@ -14,7 +14,7 @@ from flask_wtf import Form
 from wtforms import TextField
 from wtforms import validators, ValidationError
 
-from walle.model.deploy import SpaceModel
+from walle.model.user import SpaceModel
 
 
 class SpaceForm(Form):

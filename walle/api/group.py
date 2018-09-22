@@ -13,6 +13,7 @@ from walle.form.group import GroupForm
 from walle.model.user import GroupModel, UserModel
 from walle.model.tag import TagModel
 from walle.api.api import SecurityResource
+from flask import current_app
 
 class GroupAPI(SecurityResource):
     def get(self, group_id=None):
@@ -93,13 +94,16 @@ class GroupAPI(SecurityResource):
         :return:
         """
         super(GroupAPI, self).post()
+        current_app.logger.info(request.form)
+        current_app.logger.info(request.form.user_ids)
 
         form = GroupForm(request.form, csrf_enabled=False)
         if form.validate_on_submit():
-            user_ids = [int(uid) for uid in form.user_ids.data.split(',')]
+            # user_ids = [int(uid) for uid in form.user_ids.data.split(',')]
 
-            group_new = GroupModel()
-            group_id = group_new.add(group_name=form.group_name.data, user_ids=user_ids)
+            group_id = 0
+            # group_new = GroupModel()
+            # group_id = group_new.add(group_name=form.group_name.data, user_ids=user_ids)
             if not group_id:
                 return self.render_json(code=-1)
             return self.render_json(data=group_new.item())
@@ -118,12 +122,22 @@ class GroupAPI(SecurityResource):
         form = GroupForm(request.form, csrf_enabled=False)
         form.set_group_id(group_id)
         if form.validate_on_submit():
-            user_ids = [int(uid) for uid in form.user_ids.data.split(',')]
+            # pass
+            # user_ids = [int(uid) for uid in form.user_ids.data.split(',')]
+            import json
+            current_app.logger.info(form.uid_roles)
+
+            current_app.logger.info(json.loads(form.uid_roles))
 
             group_model = GroupModel(group_id=group_id)
-            group_model.update(group_id=group_id,
-                               group_name=form.group_name.data,
-                               user_ids=user_ids)
+            for uid_role in json.loads(form.uid_roles):
+                uid_role['project_id'] = 0
+                current_app.logger.info(uid_role)
+                group_model.create_or_update(uid_role, uid_role)
+
+            # group_model.update(group_id=group_id,
+            #                    group_name=form.group_name.data,
+            #                    user_ids=user_ids)
             return self.render_json(data=group_model.item())
 
         return self.render_json(code=-1, message=form.errors)

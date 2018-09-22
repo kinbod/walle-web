@@ -388,7 +388,8 @@ class GroupModel(SurrogatePK, Model):
     # 表的结构:
     id = db.Column(Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(Integer, db.ForeignKey('user.id'))
-    user_ids = db.relationship('walle.model.tag.TagModel', backref=db.backref('users'))
+    # TODO
+    # user_ids = db.relationship('walle.model.tag.TagModel', backref=db.backref('users'))
     group_id = db.Column(Integer, db.ForeignKey('tag.id'))
     created_at = db.Column(DateTime, default=current_time)
     updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)
@@ -405,8 +406,6 @@ class GroupModel(SurrogatePK, Model):
         if kw:
             group = group.filter_by(TagModel.name.like('%' + kw + '%'))
         group = group.offset(int(size) * int(page)).limit(size).all()
-        # f = open('run.log', 'w')
-        # f.write('==group_id==\n'+str(group_id)+'\n====\n')
 
         list = [p.to_json() for p in group]
         return list, 3
@@ -430,10 +429,11 @@ class GroupModel(SurrogatePK, Model):
         list = [p.to_json() for p in data]
         return list, count
 
-    def add(self, group_name, user_ids):
-        tag = TagModel(name=group_name, label='user_group')
+    def add(self, space_name, user_ids):
+        tag = TagModel(name=space_name, label='user_group')
         db.session.add(tag)
         db.session.commit()
+        current_app.logger.info(user_ids)
 
         for user_id in user_ids:
             user_group = GroupModel(group_id=tag.id, user_id=user_id)
@@ -534,6 +534,104 @@ class GroupModel(SurrogatePK, Model):
             'user_id': self.user_id,
             'group_id': self.group_id,
             'group_name': self.group_name,
+            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
+        }
+
+# 项目配置表
+class SpaceModel(SurrogatePK, Model):
+    # 表的名字:
+    __tablename__ = 'space'
+    current_time = datetime.now()
+    status_close = 0
+    status_open = 1
+
+    # 表的结构:
+    id = db.Column(Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(Integer)
+    group_id = db.Column(Integer)
+    name = db.Column(String(100))
+    status = db.Column(Integer)
+
+    created_at = db.Column(DateTime, default=current_time)
+    updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)
+
+    def list(self, page=0, size=10, kw=None):
+        """
+        获取分页列表
+        :param page:
+        :param size:
+        :return:
+        """
+        query = self.query
+        if kw:
+            query = query.filter(SpaceModel.name.like('%' + kw + '%'))
+        count = query.count()
+        data = query.order_by('id desc').offset(int(size) * int(page)).limit(size).all()
+        list = [p.to_json() for p in data]
+        return list, count
+
+    def item(self, id=None):
+        """
+        获取单条记录
+        :param role_id:
+        :return:
+        """
+        id = id if id else self.id
+        data = self.query.filter_by(id=id).first()
+
+        if not data:
+            return []
+
+        data = data.to_json()
+
+        return data
+
+    def add(self, *args, **kwargs):
+        # todo permission_ids need to be formated and checked
+        data = dict(*args)
+
+        tag = TagModel(name=data['name'], label='user_group')
+        db.session.add(tag)
+        db.session.commit()
+
+        user_group = GroupModel(group_id=tag.id, user_id=data['user_id'])
+        db.session.add(user_group)
+        db.session.commit()
+
+        data['group_id'] = tag.id
+        space = SpaceModel(**data)
+
+        db.session.add(space)
+        db.session.commit()
+        self.id = space.id
+
+        return self.id
+
+    def update(self, *args, **kwargs):
+        # todo permission_ids need to be formated and checked
+        # a new type to update a model
+
+        update_data = dict(*args)
+        return super(SpaceModel, self).update(**update_data)
+
+    def remove(self, space_id=None):
+        """
+
+        :param space_id:
+        :return:
+        """
+        space_id = space_id if space_id else self.id
+        SpaceModel.query.filter_by(id=space_id).update({'status': self.status_close})
+        return db.session.commit()
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'group_id': self.group_id,
+            'name': self.name,
+            'status': self.status,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
         }
