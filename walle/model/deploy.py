@@ -399,6 +399,7 @@ class ProjectModel(SurrogatePK, Model):
     repo_type = db.Column(String(10))
     notice_type = db.Column(String(10))
     notice_hook = db.Column(Text)
+    enable_audit = db.Column(Integer)
 
     created_at = db.Column(DateTime, default=current_time)
     updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)
@@ -499,6 +500,7 @@ class ProjectModel(SurrogatePK, Model):
             'repo_type': self.repo_type,
             'notice_type': self.notice_type,
             'notice_hook': self.notice_hook,
+            'enable_audit': self.enable_audit,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
         }
