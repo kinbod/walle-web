@@ -42,6 +42,7 @@ class ProjectForm(Form):
     repo_mode = TextField('repo_mode', [validators.Length(min=1, max=50)])
     notice_type = TextField('notice_type', [validators.Length(min=1, max=10)])
     notice_hook = TextField('notice_hook', [validators.Length(min=1)])
+    enable_audit = TextField('enable_audit', [validators.Length(min=1, max=10)])
 
     id = None
 
@@ -84,4 +85,5 @@ class ProjectForm(Form):
 
             'notice_type': self.notice_type.data if self.notice_type.data else '',
             'notice_hook': self.notice_hook.data if self.notice_hook.data else '',
+            'enable_audit': self.enable_audit.data if self.enable_audit.data else 0,
         }
