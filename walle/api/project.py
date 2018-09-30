@@ -13,7 +13,6 @@ from walle.api.api import SecurityResource
 from walle.form.project import ProjectForm
 from walle.model.deploy import ProjectModel
 
-
 class ProjectAPI(SecurityResource):
     def get(self, project_id=None):
         """
@@ -36,9 +35,10 @@ class ProjectAPI(SecurityResource):
         page = page - 1 if page else 0
         size = float(request.args.get('size', 10))
         kw = request.values.get('kw', '')
+        environment_id = request.values.get('environment_id', '')
 
         project_model = ProjectModel()
-        project_list, count = project_model.list(page=page, size=size, kw=kw)
+        project_list, count = project_model.list(page=page, size=size, kw=kw, environment_id=environment_id)
         return self.list_json(list=project_list, count=count)
 
     def item(self, project_id):

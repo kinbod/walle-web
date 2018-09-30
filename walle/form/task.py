@@ -20,8 +20,10 @@ class TaskForm(Form):
     name = TextField('name', [validators.Length(min=1)])
     project_id = IntegerField('project_id', [validators.NumberRange(min=1)])
     servers = TextField('servers', [validators.Length(min=1)])
-    commit_id = TextField('commit_id', [validators.Length(min=1)])
-    branch = TextField('branch', [validators.Length(min=1)])
+    commit_id = TextField('commit_id', [])
+    # TODO 应该增加一个tag/branch其一必填
+    tag = TextField('tag', [])
+    branch = TextField('branch', [])
     file_transmission_mode = IntegerField('file_transmission_mode', [validators.NumberRange(min=0)])
     file_list = TextField('file_list', [validators.Length(min=1)])
 
@@ -43,6 +45,7 @@ class TaskForm(Form):
             'ex_link_id': '',
             'servers': self.servers.data if self.servers.data else '',
             'commit_id': self.commit_id.data if self.commit_id.data else '',
+            'tag': self.tag.data if self.tag.data else '',
             'branch': self.branch.data if self.branch.data else '',
             'file_transmission_mode': self.file_transmission_mode.data if self.file_transmission_mode.data else 0,
             'file_list': self.file_list.data if self.file_list.data else '',

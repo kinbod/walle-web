@@ -32,6 +32,7 @@ class TaskModel(SurrogatePK, Model):
     servers = db.Column(Text)
     commit_id = db.Column(String(40))
     branch = db.Column(String(100))
+    tag = db.Column(String(100))
     file_transmission_mode = db.Column(Integer)
     file_list = db.Column(Text)
     enable_rollback = db.Column(Integer)
@@ -141,6 +142,7 @@ class TaskModel(SurrogatePK, Model):
             'servers': self.servers,
             'commit_id': self.commit_id,
             'branch': self.branch,
+            'tag': self.tag,
             'file_transmission_mode': self.file_transmission_mode,
             'file_list': self.file_list,
             'enable_rollback': self.enable_rollback,
@@ -404,7 +406,7 @@ class ProjectModel(SurrogatePK, Model):
     created_at = db.Column(DateTime, default=current_time)
     updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)
 
-    def list(self, page=0, size=10, kw=None):
+    def list(self, page=0, size=10, kw=None, environment_id=None):
         """
         获取分页列表
         :param page:
@@ -414,6 +416,9 @@ class ProjectModel(SurrogatePK, Model):
         query = self.query
         if kw:
             query = query.filter(ProjectModel.name.like('%' + kw + '%'))
+
+        if environment_id:
+            query = query.filter_by(environment_id=environment_id)
         count = query.count()
         data = query.order_by('id desc').offset(int(size) * int(page)).limit(size).all()
         list = [p.to_json() for p in data]
