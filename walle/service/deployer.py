@@ -35,6 +35,7 @@ class Deployer:
     stage_post_release = 'post_release'
 
     task_id = ''
+    user_id = ''
     taskMdl = None
     TaskRecord = None
 
@@ -99,7 +100,6 @@ class Deployer:
         current_app.logger.info(command)
 
         result = self.local.run(command, wenv=self.config())
-        return True
 
         # 检查 python 版本
         command = 'python --version'
@@ -300,6 +300,18 @@ class Deployer:
         with waller.cd(self.project_info['target_root']):
             command = 'sudo service nginx restart'
             result = waller.run(command, wenv=self.config())
+
+
+    def list_tag(self):
+        # 否则当作新项目检出完整代码
+        with self.local.cd(self.dir_codebase_project):
+            command = 'git tag -l --cleanup strip'
+            current_app.logger.info('cd %s  command: %s  ', self.dir_codebase_project, command)
+            result = self.local.run(command, wenv=self.config())
+            current_app.logger.info(dir(result))
+            return result
+
+        return None
 
     def walle_deploy(self):
 

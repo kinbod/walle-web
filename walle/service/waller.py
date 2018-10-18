@@ -16,26 +16,39 @@ class Waller(Connection):
     release_version_tar, release_version = None, None
 
     def run(self, command, wenv=None, sudo=False, **kwargs):
+        '''
+        # TODO
+        pty=True/False是直接影响到输出.False较适合在获取文本,True更适合websocket
+
+        :param command:
+        :param wenv:
+        :param sudo:
+        :param kwargs:
+        :return:
+        '''
         try:
             message = 'task_id=%s, host:%s command:%s' % (
                 wenv['task_id'], self.host, command
             )
             current_app.logger.info(message)
             if sudo:
-                result = super(Waller, self).sudo(command, pty=True, **kwargs)
+                result = super(Waller, self).sudo(command, pty=False, **kwargs)
             else:
-                result = super(Waller, self).run(command, pty=True, **kwargs)
+                result = super(Waller, self).run(command, pty=False, **kwargs)
 
             message = 'task_id=%s, host:%s command:%s status:%s, success:%s, error:%s' % (
                 wenv['task_id'], self.host, command, result.exited, result.stdout.strip(), result.stderr.strip()
             )
 
-            wenv['websocket'].send_updates(message)
+            # TODO
+            if wenv.has_key('websocket') and wenv['websocket']:
+                wenv['websocket'].send_updates(message)
             TaskRecordModel().save_record(stage=wenv['stage'], sequence=wenv['sequence'], user_id=wenv['user_id'],
                                           task_id=wenv['task_id'], status=result.exited, host=self.host, user=self.user,
                                           command=result.command,success=result.stdout.strip(), error=result.stderr.strip())
             current_app.logger.info(message)
             return result
+
         except Exception, e:
             #current_app.logger.exception(e)
             #return None
@@ -51,9 +64,11 @@ class Waller(Connection):
                 message = 'task_id=%s, host:%s command:%s, status=1, message:%s' % (
                     wenv['task_id'], self.host, command, e.message
                 )
-                
-            wenv['websocket'].send_updates(message)
-            current_app.logger.error(message)
+
+            # TODO
+            if wenv.has_key('websocket') and wenv['websocket']:
+                wenv['websocket'].send_updates(message)
+            # current_app.logger.error(message)
 
             return False
 
