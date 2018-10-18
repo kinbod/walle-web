@@ -24,7 +24,7 @@ class Deployer:
     '''
     序列号
     '''
-    stage = ''
+    stage = '0'
 
     sequence = 0
     stage_prev_deploy = 'prev_deploy'
@@ -35,7 +35,7 @@ class Deployer:
     stage_release = 'release'
     stage_post_release = 'post_release'
 
-    task_id = ''
+    task_id = '0'
     user_id = '0'
     taskMdl = None
     TaskRecord = None
