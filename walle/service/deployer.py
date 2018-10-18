@@ -14,6 +14,7 @@ from flask import current_app
 
 from walle.model import deploy as TaskModel
 from walle.service.waller import Waller
+from walle.model.deploy import ProjectModel
 
 
 # import fabric2.exceptions.GroupException
@@ -44,7 +45,6 @@ class Deployer:
     dir_codebase = '/tmp/walle/codebase/'
     dir_codebase_project = dir_codebase + project_name
 
-
     # 定义远程机器
     # env.hosts = ['172.16.0.231', '172.16.0.177']
 
@@ -55,10 +55,10 @@ class Deployer:
     release_version_tar, release_version = None, None
     local, websocket = None, None
 
-    def __init__(self, task_id=None, websocket=None):
+    def __init__(self, task_id=None, project_id=None, websocket=None):
         self.local = Waller(host=current_app.config.get('LOCAL_SERVER_HOST'),
-                   user=current_app.config.get('LOCAL_SERVER_USER'),
-                   port=current_app.config.get('LOCAL_SERVER_PORT'))
+                            user=current_app.config.get('LOCAL_SERVER_USER'),
+                            port=current_app.config.get('LOCAL_SERVER_PORT'))
         self.TaskRecord = TaskModel.TaskRecordModel()
         if websocket:
             websocket.send_updates(__name__)
@@ -70,6 +70,9 @@ class Deployer:
             self.servers = self.taskMdl.get('servers').split(',')
             self.task = self.taskMdl.get('target_user')
             self.project_info = self.taskMdl.get('project_info')
+        if project_id:
+            self.project_id = project_id
+            self.project_info = ProjectModel(id=project_id).item()
 
     def config(self):
         return {'task_id': self.task_id, 'user_id': self.user_id, 'stage': self.stage, 'sequence': self.sequence,
@@ -301,15 +304,41 @@ class Deployer:
             command = 'sudo service nginx restart'
             result = waller.run(command, wenv=self.config())
 
-
     def list_tag(self):
-        # 否则当作新项目检出完整代码
         with self.local.cd(self.dir_codebase_project):
             command = 'git tag -l --cleanup strip'
             current_app.logger.info('cd %s  command: %s  ', self.dir_codebase_project, command)
             result = self.local.run(command, wenv=self.config())
             current_app.logger.info(dir(result))
             return result
+
+        return None
+
+    def list_branch(self):
+        with self.local.cd(self.dir_codebase_project):
+            command = 'git pull'
+            # result = self.local.run(command, wenv=self.config())
+
+            command = 'git branch -r'
+            result = self.local.run(command, wenv=self.config())
+
+            branches = result.stdout.strip().split('\n')
+            # 去除 origin/HEAD -> 当前指向
+            # 去除远端前缀
+            branches = [branch.strip().lstrip('origin/') for branch in branches if not branch.startswith('origin/HEAD')]
+            return branches
+
+        return None
+
+    def list_commit(self, branch):
+        with self.local.cd(self.dir_codebase_project):
+            command = 'git checkout %s && git pull' % (branch)
+            result = self.local.run(command, wenv=self.config())
+
+            command = 'git log -10 --pretty="%h - %an %s"'
+            result = self.local.run(command, wenv=self.config())
+            commits = result.stdout.strip().split('\n')
+            return commits
 
         return None
 
