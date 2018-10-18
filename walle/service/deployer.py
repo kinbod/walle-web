@@ -306,7 +306,7 @@ class Deployer:
 
     def list_tag(self):
         with self.local.cd(self.dir_codebase_project):
-            command = 'git tag -l --cleanup strip'
+            command = 'git tag -l'
             current_app.logger.info('cd %s  command: %s  ', self.dir_codebase_project, command)
             result = self.local.run(command, wenv=self.config())
             current_app.logger.info(dir(result))
