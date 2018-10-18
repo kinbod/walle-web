@@ -22,6 +22,7 @@ from walle.api import server as ServerAPI
 from walle.api import task as TaskAPI
 from walle.api import user as UserAPI
 from walle.api import space as SpaceAPI
+from walle.api import repo as RepoApi
 from walle.config.settings_dev import DevConfig
 from walle.config.settings_test import TestConfig
 from walle.config.settings_prod import ProdConfig
@@ -83,6 +84,7 @@ def register_blueprints(app):
     api.add_resource(UserAPI.UserAPI, '/api/user/', '/api/user/<int:user_id>', endpoint='user')
     api.add_resource(ServerAPI.ServerAPI, '/api/server/', '/api/server/<int:id>', endpoint='server')
     api.add_resource(ProjectAPI.ProjectAPI, '/api/project/', '/api/project/<int:project_id>', endpoint='project')
+    api.add_resource(RepoApi.RepoAPI, '/api/repo/<string:method>/', endpoint='repo')
     api.add_resource(TaskAPI.TaskAPI, '/api/task/', '/api/task/<int:task_id>', endpoint='task')
     api.add_resource(EnvironmentAPI.EnvironmentAPI, '/api/environment/', '/api/environment/<int:env_id>',
                      endpoint='environment')
