@@ -36,7 +36,7 @@ class Deployer:
     stage_post_release = 'post_release'
 
     task_id = ''
-    user_id = ''
+    user_id = '0'
     taskMdl = None
     TaskRecord = None
 
