@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """The app module, containing the app factory function."""
 import logging
-import sys
+import sys, os
 
 from flask import Flask, render_template
 from flask_restful import Api
@@ -133,6 +133,10 @@ def register_logging(app):
     # Formatter
     formatter = logging.Formatter(
             '%(asctime)s %(levelname)s %(pathname)s %(lineno)s %(module)s.%(funcName)s %(message)s')
+
+    # log dir
+    if not os.path.exists(app.config['LOG_PATH']):
+        os.makedirs(app.config['LOG_PATH'])
 
     # FileHandler Info
     file_handler_info = RotatingFileHandler(filename=app.config['LOG_PATH_INFO'])
