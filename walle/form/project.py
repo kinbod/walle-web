@@ -40,8 +40,8 @@ class ProjectForm(Form):
     repo_username = TextField('repo_username', [])
     repo_password = TextField('repo_password', [])
     repo_mode = TextField('repo_mode', [validators.Length(min=1, max=50)])
-    notice_type = TextField('notice_type', [validators.Length(min=1, max=10)])
-    notice_hook = TextField('notice_hook', [validators.Length(min=1)])
+    notice_type = TextField('notice_type', [])
+    notice_hook = TextField('notice_hook', [])
     enable_audit = TextField('enable_audit', [validators.Length(min=1, max=10)])
 
     id = None
