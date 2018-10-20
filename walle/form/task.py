@@ -24,8 +24,8 @@ class TaskForm(Form):
     # TODO 应该增加一个tag/branch其一必填
     tag = TextField('tag', [])
     branch = TextField('branch', [])
-    file_transmission_mode = IntegerField('file_transmission_mode', [validators.NumberRange(min=0)])
-    file_list = TextField('file_list', [validators.Length(min=1)])
+    file_transmission_mode = IntegerField('file_transmission_mode', [])
+    file_list = TextField('file_list', [])
 
     id = None
 
