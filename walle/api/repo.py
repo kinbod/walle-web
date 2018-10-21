@@ -7,11 +7,10 @@
     :created time: 2017-03-25 11:15:01
     :author: wushuiyong@walle-web.io
 """
-import re
-from flask import request, current_app
+from flask import request
 from walle.api.api import SecurityResource
-from walle.model.deploy import ProjectModel
 from walle.service.deployer import Deployer
+
 
 class RepoAPI(SecurityResource):
     def get(self, method, commit=None):
@@ -33,8 +32,6 @@ class RepoAPI(SecurityResource):
             return self.commits(project_id=project_id, branch=branch)
         return self.list_json(list=[])
 
-
-
     def tags(self, project_id=None):
         """
         fetch project list or one item
@@ -46,10 +43,8 @@ class RepoAPI(SecurityResource):
         tag_list = wi.list_tag()
         tags = tag_list.stdout.strip().split('\n')
         return self.render_json(data={
-                'tags': tags,
+            'tags': tags,
         })
-
-
 
     def branches(self, project_id=None):
         """
@@ -61,10 +56,8 @@ class RepoAPI(SecurityResource):
         wi = Deployer(project_id=project_id)
         branches = wi.list_branch()
         return self.render_json(data={
-                'branches': branches,
+            'branches': branches,
         })
-
-
 
     def commits(self, project_id, branch):
         """
@@ -74,14 +67,8 @@ class RepoAPI(SecurityResource):
         :return:
         """
         wi = Deployer(project_id=project_id)
-        commit_list = wi.list_commit(branch)
-        commits = []
-        for commit in commit_list:
-            commits.append({
-                'id':commit[0:7],
-                'name':commit,
-            })
-        return self.render_json(data={
-                'branches': commits,
-        })
+        commits = wi.list_commit(branch)
 
+        return self.render_json(data={
+            'branches': commits,
+        })

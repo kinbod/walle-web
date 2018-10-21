@@ -21,6 +21,7 @@ from walle.model.deploy import ProjectModel
 
 
 class Deployer:
+
     '''
     序列号
     '''
@@ -335,9 +336,18 @@ class Deployer:
             command = 'git checkout %s && git pull' % (branch)
             result = self.local.run(command, wenv=self.config())
 
-            command = 'git log -10 --pretty="%h - %an %s"'
+            # TODO 10是需要前端传的
+            command = 'git log -10 --pretty="%h #_# %an #_# %s"'
             result = self.local.run(command, wenv=self.config())
-            commits = result.stdout.strip().split('\n')
+            commit_list = result.stdout.strip().split('\n')
+            commits = []
+            for commit in commit_list:
+                commit_dict = commit.split(' #_# ')
+                commits.append({
+                    'id': commit_dict[0],
+                    'name': commit_dict[1],
+                    'message': commit_dict[2],
+                })
             return commits
 
         return None
