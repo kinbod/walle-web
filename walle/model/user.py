@@ -5,13 +5,13 @@
 # @Description:
 
 from flask_login import UserMixin
-from sqlalchemy import String, Integer, Text, DateTime, or_
+from sqlalchemy import String, Integer, DateTime, or_
 from werkzeug.security import check_password_hash, generate_password_hash
 
 # from flask_cache import Cache
 from datetime import datetime
 from walle.service.extensions import login_manager
-from walle.model.database import SurrogatePK, db, relationship, Model
+from walle.model.database import SurrogatePK, db, Model
 from walle.model.tag import TagModel
 from sqlalchemy.orm import aliased
 from walle.service.rbac.access import Access as AccessRbac
@@ -31,9 +31,9 @@ class UserModel(UserMixin, SurrogatePK, Model):
     email = db.Column(String(50), unique=True, nullable=False)
     password = db.Column(String(50), nullable=False)
     avatar = db.Column(String(100))
-    role_id = db.Column(Integer, db.ForeignKey('role.id'), default=1)
+    role_id = db.Column(Integer, default=1)
     status = db.Column(Integer, default=1)
-    role_info = relationship("walle.model.user.RoleModel", back_populates="users")
+    # role_info = relationship("walle.model.user.RoleModel", back_populates="users")
     created_at = db.Column(DateTime, default=current_time)
     updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)
 
@@ -95,7 +95,6 @@ class UserModel(UserMixin, SurrogatePK, Model):
         self.password = generate_password_hash(password)
         return generate_password_hash(password)
 
-
     def fetch_access_list_by_role_id(self, role_id):
         module = aliased(AccessModel)
         controller = aliased(AccessModel)
@@ -103,7 +102,7 @@ class UserModel(UserMixin, SurrogatePK, Model):
         role = RoleModel.query.get(role_id)
         access_ids = role.access_ids.split(',')
 
-        data = db.session\
+        data = db.session \
             .query(controller.name_en, controller.name_cn,
                    action.name_en, action.name_cn) \
             .outerjoin(action, action.pid == controller.id) \
@@ -111,7 +110,6 @@ class UserModel(UserMixin, SurrogatePK, Model):
             .filter(controller.id.in_(access_ids)) \
             .filter(action.id.in_(access_ids)) \
             .all()
-
 
         return [AccessRbac.resource(a_en, c_en) for c_en, c_cn, a_en, a_cn in data if c_en and a_en]
 
@@ -169,7 +167,7 @@ class UserModel(UserMixin, SurrogatePK, Model):
             'avatar': self.avatar,
             'role_id': self.role_id,
             'status': self.status_mapping[self.status],
-            'role_name': self.role_info.name,
+            'role_name': self.role_id,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
         }
@@ -298,85 +296,31 @@ class AccessModel(SurrogatePK, Model):
         }
 
 
-# 项目配置表
-class RoleModel(UserMixin, SurrogatePK, Model):
-    # 表的名字:
-    __tablename__ = 'role'
+class RoleModel(object):
+    _role_super = 'SUPER'
 
-    # current_time = datetime.now()
-    current_time = datetime.now()
+    _role_owner = 'OWNER'
 
-    # 表的结构:
-    id = db.Column(Integer, primary_key=True, autoincrement=True)
-    name = db.Column(String(30))
-    access_ids = db.Column(Text, default='')
-    users = relationship("UserModel", back_populates="role_info")
+    _role_master = 'MASTER'
 
-    created_at = db.Column(DateTime, default=current_time)
-    updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)
+    _role_developer = 'DEVELOPER'
 
-    def list(self, page=0, size=10, kw=None):
-        """
-        获取分页列表
-        :param page:
-        :param size:
-        :return:
-        """
-        query = RoleModel.query
-        if kw:
-            query = query.filter(RoleModel.name.like('%' + kw + '%'))
-        count = query.count()
-        data = query.order_by('id desc').offset(int(size) * int(page)).limit(size).all()
-        list = [p.to_json() for p in data]
-        return list, count
+    _role_reporter = 'REPORTER'
 
-    def item(self, role_id=None):
-        """
-        获取单条记录
-        :param role_id:
-        :return:
-        """
-        role_id = role_id if role_id else self.id
-        data = RoleModel.query.filter_by(id=role_id).first()
-        return data.to_json() if data else []
+    @classmethod
+    def list(cls):
+        roles = [
+            {'id': cls._role_super, 'name': '超级管理员'},
+            {'id': cls._role_owner, 'name': '空间所有者'},
+            {'id': cls._role_master, 'name': '项目管理员'},
+            {'id': cls._role_developer, 'name': '开发者'},
+            {'id': cls._role_reporter, 'name': '访客'},
+        ]
+        return roles, len(roles)
 
-    def add(self, name, access_ids):
-        # todo access_ids need to be formated and checked
-        role = RoleModel(name=name, access_ids=access_ids)
-
-        db.session.add(role)
-        db.session.commit()
-        self.id = role.id
-        return self.id
-
-    def update(self, name, access_ids, role_id=None):
-        # todo access_ids need to be formated and checked
-        role_id = role_id if role_id else self.id
-        role = RoleModel.query.filter_by(id=role_id).first()
-        role.name = name
-        role.access_ids = access_ids
-
-        return db.session.commit()
-
-    def remove(self, role_id=None):
-        """
-
-        :param role_id:
-        :return:
-        """
-        role_id = role_id if role_id else self.id
-        RoleModel.query.filter_by(id=role_id).delete()
-        return db.session.commit()
-
-    def to_json(self):
-        return {
-            'id': self.id,
-            'role_name': self.name,
-            'access_ids': self.access_ids,
-            'users': len(self.users),
-            'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-            'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
-        }
+    @classmethod
+    def item(cls, role_id):
+        return None
 
 
 # 项目配置表
@@ -538,6 +482,7 @@ class GroupModel(SurrogatePK, Model):
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
         }
 
+
 # 项目配置表
 class SpaceModel(SurrogatePK, Model):
     # 表的名字:
@@ -637,12 +582,11 @@ class SpaceModel(SurrogatePK, Model):
         }
 
 
-
 @login_manager.user_loader
 def load_user(user_id):
-    user = UserModel.query.get(user_id)
-    role = RoleModel().item(user.role_id)
-    access = UserModel().fetch_access_list_by_role_id(user.role_id)
+    # user = UserModel.query.get(user_id)
+    # role = RoleModel().item(user.role_id)
+    # access = UserModel().fetch_access_list_by_role_id(user.role_id)
     # logging.error(RoleModel.query.get(user.role_id).access_ids)
     # logging.error(role['access_ids'].split(','))
     # logging.error(UserModel.query.get(user_id))
