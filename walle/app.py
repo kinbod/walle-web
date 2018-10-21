@@ -184,7 +184,7 @@ class InfoFilter(logging.Filter):
             return 0
 
  # TODO optimize
-@app.route('/demo/websocket')
+@app.route('/api/websocket')
 def index():
 
     return render_template('websocket.html')
