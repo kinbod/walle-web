@@ -39,16 +39,17 @@ class Waller(Connection):
             message = 'task_id=%s, host:%s command:%s status:%s, success:%s, error:%s' % (
                 wenv['task_id'], self.host, command, result.exited, result.stdout.strip(), result.stderr.strip()
             )
-            ws_dict = {
-                'host': self.host,
-                'cmd': command,
-                'status': result.exited,
-                'success': result.stdout.strip(),
-                'error': result.stderr.strip(),
-            }
 
             # TODO
             if wenv.has_key('websocket') and wenv['websocket']:
+
+                ws_dict = {
+                    'host': self.host,
+                    'cmd': command,
+                    'status': result.exited,
+                    'success': result.stdout.strip(),
+                    'error': result.stderr.strip(),
+                }
                 wenv['websocket'].send_updates(ws_dict)
             TaskRecordModel().save_record(stage=wenv['stage'], sequence=wenv['sequence'], user_id=wenv['user_id'],
                                           task_id=wenv['task_id'], status=result.exited, host=self.host, user=self.user,
@@ -74,7 +75,15 @@ class Waller(Connection):
 
             # TODO
             if wenv.has_key('websocket') and wenv['websocket']:
-                wenv['websocket'].send_updates(message)
+
+                ws_dict = {
+                    'host': self.host,
+                    'cmd': command,
+                    'status': 1,
+                    'success': '',
+                    'error': e.message,
+                }
+                wenv['websocket'].send_updates(ws_dict)
             # current_app.logger.error(message)
 
             return False

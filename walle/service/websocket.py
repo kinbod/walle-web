@@ -43,7 +43,7 @@ class WSHandler(WebSocketHandler):
 
     @classmethod
     def send_updates(cls, incoming):
-        response = json.dumps(dict(output='update: {0}'.format(str(incoming))))
+        response = json.dumps(incoming)
         current_app.logger.info("sending %s to %d waiters", str(incoming), len(cls.waiters))
         current_app.logger.info(cls.waiters)
         for waiter in cls.waiters:

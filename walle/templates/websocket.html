@@ -16,7 +16,7 @@
             ws = new WebSocket("ws://" + document.domain + "/websocket/console");
             ws.onmessage = function (msg) {
                 var message = JSON.parse(msg.data);
-                $("p#log").html($("p#log").html() + "<p>" + message.output + "</p>");
+                $("p#log").html($("p#log").html() + "<p>" + msg.data + "</p>");
             };
 
             // Bind send button to websocket
