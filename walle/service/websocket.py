@@ -9,7 +9,7 @@
 import anyjson as json
 from tornado.websocket import WebSocketHandler
 from flask import current_app
-
+from walle.service.deployer import Deployer
 
 class WSHandler(WebSocketHandler):
     waiters = set()
@@ -28,9 +28,13 @@ class WSHandler(WebSocketHandler):
         print 'message received %s' % incoming
 
         text = json.loads(incoming).get('text', None)
-        msg = text if text else 'Sorry could you repeat?'
+        task_id = text if text else 'Sorry could you repeat?'
 
-        response = json.dumps(dict(output='receive: {0}'.format(msg)))
+
+        wi = Deployer(task_id, websocket=self)
+        ret = wi.walle_deploy()
+
+        response = json.dumps(dict(output='receive: {0}'.format(task_id)))
         self.write_message(response)
 
     def on_close(self):

@@ -50,9 +50,13 @@ def create_app(config_object=ProdConfig):
     register_commands(app)
     register_logging(app)
 
+    # app.logger.info('=== testing ===')
+
     # 测试环境跑单测失败
     if not app.config['TESTING']:
         register_websocket(app)
+
+    register_websocket(app)
 
     reload(sys)
     sys.setdefaultencoding('utf-8')
@@ -157,6 +161,11 @@ def register_logging(app):
 
 def register_websocket(app):
     settings = {'debug': True}
+
+    # TODO fix websocket app_context
+    ctx = app.app_context()
+    ctx.push()
+
     wsgi_app = WSGIContainer(app)
 
     application = Application([
