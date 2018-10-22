@@ -20,6 +20,10 @@ class TestConfig(Config):
     ASSETS_DEBUG = True  # Don't bundle/minify static assets
     CACHE_TYPE = 'simple'  # Can be "memcached", "redis", etc.
 
+    # 前端项目部署路径
+    FE_PATH = '/Users/wushuiyong/workspace/meolu/walle-fe/'
+    UPLOAD_AVATER = FE_PATH + 'dist/avater/'
+
     #email config
     MAIL_SERVER = 'smtp.exmail.qq.com'
     MAIL_PORT = 465
@@ -37,7 +41,6 @@ class TestConfig(Config):
     # 轮转数量是 10 个
     LOG_FILE_BACKUP_COUNT = 10
     LOG_FORMAT = "%(asctime)s %(thread)d %(message)s"
-
 
     LOCAL_SERVER_HOST = '127.0.0.1'
     LOCAL_SERVER_USER = 'wushuiyong'

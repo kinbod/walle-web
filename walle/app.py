@@ -85,7 +85,7 @@ def register_blueprints(app):
     api.add_resource(RoleAPI.RoleAPI, '/api/role/', '/api/role/<int:role_id>', endpoint='role')
     api.add_resource(GroupAPI.GroupAPI, '/api/group/', '/api/group/<int:group_id>', endpoint='group')
     api.add_resource(PassportAPI.PassportAPI, '/api/passport/', '/api/passport/<string:method>', endpoint='passport')
-    api.add_resource(UserAPI.UserAPI, '/api/user/', '/api/user/<int:user_id>', endpoint='user')
+    api.add_resource(UserAPI.UserAPI, '/api/user/', '/api/user/<string:method>', '/api/user/<int:user_id>', endpoint='user')
     api.add_resource(ServerAPI.ServerAPI, '/api/server/', '/api/server/<int:id>', endpoint='server')
     api.add_resource(ProjectAPI.ProjectAPI, '/api/project/', '/api/project/<int:project_id>', endpoint='project')
     api.add_resource(RepoApi.RepoAPI, '/api/repo/<string:method>/', endpoint='repo')

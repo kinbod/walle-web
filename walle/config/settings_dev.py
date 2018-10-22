@@ -2,7 +2,7 @@
 """Application configuration."""
 import os
 from walle.config.settings import Config
-
+from datetime import timedelta
 
 class DevConfig(Config):
     """Development configuration."""
@@ -18,6 +18,11 @@ class DevConfig(Config):
     DEBUG_TB_ENABLED = True
     ASSETS_DEBUG = True  # Don't bundle/minify static assets
     CACHE_TYPE = 'simple'  # Can be "memcached", "redis", etc.
+    PERMANENT_SESSION_LIFETIME = timedelta(days=1) #设置session的保存时间。
+
+    # 前端项目部署路径
+    FE_PATH = '/Users/wushuiyong/workspace/meolu/walle-fe/'
+    UPLOAD_AVATER = FE_PATH + 'dist/avater/'
 
     #email config
     MAIL_SERVER = 'smtp.exmail.qq.com'
@@ -42,4 +47,4 @@ class DevConfig(Config):
     LOCAL_SERVER_USER = 'wushuiyong'
     LOCAL_SERVER_PORT = 22
 
-    SQLALCHEMY_ECHO = True
+    # SQLALCHEMY_ECHO = True

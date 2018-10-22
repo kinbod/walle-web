@@ -7,20 +7,19 @@
     :created time: 2017-03-25 11:15:01
     :author: wushuiyong@walle-web.io
 """
-
-from flask import request
-from werkzeug.security import generate_password_hash
+import os
+from flask import request, current_app
+from walle.api.api import SecurityResource
 from walle.form.user import UserUpdateForm, RegistrationForm
 from walle.model.database import db
-from walle.model.user import UserModel
 from walle.model.user import GroupModel
-from walle.model.tag import TagModel
-from walle.api.api import SecurityResource
-
+from walle.model.user import UserModel
+from werkzeug.security import generate_password_hash
+from werkzeug.utils import secure_filename
+from flask_login import current_user
 
 class UserAPI(SecurityResource):
-
-    def get(self, user_id=None):
+    def get(self, user_id=None, method=None):
         """
         fetch user list or one user
         /user/<int:user_id>
@@ -30,6 +29,7 @@ class UserAPI(SecurityResource):
         super(UserAPI, self).get()
 
         return self.item(user_id) if user_id else self.list()
+
 
     def list(self):
         """
@@ -45,8 +45,8 @@ class UserAPI(SecurityResource):
         user_model = UserModel()
         user_list, count = user_model.list(page=page, size=size, kw=kw)
         filter = {
-            'username':['线上','线下'],
-            'status':['正常', '禁用']
+            'username': ['线上', '线下'],
+            'status': ['正常', '禁用']
         }
         return self.list_json(list=user_list, count=count, table=self.table(filter))
 
@@ -63,7 +63,7 @@ class UserAPI(SecurityResource):
             return self.render_json(code=-1)
         return self.render_json(data=user_info)
 
-    def post(self):
+    def post(self, method=None):
         """
         create user
         /user/
@@ -71,6 +71,10 @@ class UserAPI(SecurityResource):
         :return:
         """
         super(UserAPI, self).post()
+
+        # 更新头像
+        if method == 'avater':
+            return self.avater()
 
         form = RegistrationForm(request.form, csrf_enabled=False)
         if form.validate_on_submit():
@@ -140,3 +144,18 @@ class UserAPI(SecurityResource):
                 value['value'] = []
             ret.append(value)
         return ret
+
+    def avater(self):
+        # TODO uid
+        # fname = current_user.id + '.jpg'
+
+        UPLOAD_FOLDER = 'fe/public/avater'
+        f = request.files['avater']
+        # todo rename to uid relation
+        fname = secure_filename(f.filename)
+        ret = f.save(os.path.join(current_app.config['UPLOAD_AVATER'], fname))
+
+        return self.render_json(data={
+            'avarter': str(request.args),
+            'u': dir(current_user),
+        })

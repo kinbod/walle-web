@@ -65,7 +65,6 @@ class ProjectAPI(SecurityResource):
         super(ProjectAPI, self).post()
 
         form = ProjectForm(request.form, csrf_enabled=False)
-        # return self.render_json(code=-1, data = form.form2dict())
         if form.validate_on_submit():
             project_new = ProjectModel()
             data = form.form2dict()
@@ -85,7 +84,6 @@ class ProjectAPI(SecurityResource):
         :return:
         """
         super(ProjectAPI, self).put()
-
 
         form = ProjectForm(request.form, csrf_enabled=False)
         form.set_id(project_id)

@@ -22,6 +22,7 @@ class ProjectForm(Form):
     environment_id = TextField('environment_id', [validators.Length(min=1, max=10)])
     status = TextField('status', [validators.Length(min=1, max=10)])
     excludes = TextField('excludes', [])
+    master = TextField('master', [])
     server_ids = TextField('server_ids', [validators.Length(min=1)])
     keep_version_num = TextField('keep_version_num', [])
 
@@ -62,6 +63,7 @@ class ProjectForm(Form):
             'user_id': 1,
 
             'status': self.status.data if self.status.data else 0,
+            'master': self.master.data if self.master.data else '',
             'environment_id': self.environment_id.data if self.environment_id.data else '',
             'excludes': self.excludes.data if self.excludes.data else '',
             'server_ids': self.server_ids.data if self.server_ids.data else '',

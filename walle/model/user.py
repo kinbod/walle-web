@@ -143,20 +143,19 @@ class UserModel(UserMixin, SurrogatePK, Model):
         user_list = [p.to_json() for p in data]
         return user_list, count
 
-    def fetch_by_uid(self, uids=None):
+    @classmethod
+    def fetch_by_uid(cls, uids=None):
         """
-        获取分页列表
-        :param page:
-        :param size:
+        用户列表
+        :param uids: []
         :return:
         """
-        query = UserModel.query
-        if uids:
-            query = query.filter(UserModel.id.in_(uids))
+        if not uids:
+            return None
+
+        query = UserModel.query.filter(UserModel.id.in_(uids))
         data = query.order_by('id desc').all()
-        # current_app.logger.info(data)
-        user_list = [p.to_json() for p in data]
-        return user_list
+        return [p.to_json() for p in data]
 
     def to_json(self):
         return {

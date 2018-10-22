@@ -10,7 +10,7 @@ from sqlalchemy import String, Integer, Text, DateTime
 from datetime import datetime
 
 from walle.model.database import SurrogatePK, db, Model
-
+from walle.model.user import UserModel
 
 # from walle.service.rbac import access as rbac
 
@@ -381,6 +381,7 @@ class ProjectModel(SurrogatePK, Model):
     name = db.Column(String(100))
     environment_id = db.Column(Integer)
     status = db.Column(Integer)
+    master = db.Column(String(100))
     version = db.Column(String(40))
     excludes = db.Column(Text)
     target_user = db.Column(String(50))
@@ -478,6 +479,8 @@ class ProjectModel(SurrogatePK, Model):
         ProjectModel.query.filter_by(id=role_id).delete()
         return db.session.commit()
 
+
+
     def to_json(self):
         return {
             'id': self.id,
@@ -485,6 +488,7 @@ class ProjectModel(SurrogatePK, Model):
             'name': self.name,
             'environment_id': self.environment_id,
             'status': self.status,
+            'master': UserModel.fetch_by_uid(self.master.split(',')) if self.master else '',
             'version': self.version,
             'excludes': self.excludes,
             'target_user': self.target_user,
