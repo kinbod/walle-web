@@ -68,7 +68,7 @@ class Deployer:
             self.task_id = task_id
             self.taskMdl = TaskModel.TaskModel().item(self.task_id)
             self.user_id = self.taskMdl.get('user_id')
-            self.servers = self.taskMdl.get('servers').split(',')
+            self.servers = self.taskMdl.get('servers_info')
             self.task = self.taskMdl.get('target_user')
             self.project_info = self.taskMdl.get('project_info')
         if project_id:
@@ -368,7 +368,8 @@ class Deployer:
             current_app.logger.exception(e)
             self.errors[server] = e.message
 
-        # for server in self.servers:
+        # for server_info in self.servers:
+        #     server = server_info.host
         #     try:
         #         self.connections[server] = Waller(host=server, user=self.project_info['target_user'])
         #         self.prev_release(self.connections[server])

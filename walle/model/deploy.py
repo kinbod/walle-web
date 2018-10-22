@@ -140,6 +140,7 @@ class TaskModel(SurrogatePK, Model):
             'link_id': self.link_id,
             'ex_link_id': self.ex_link_id,
             'servers': self.servers,
+            'servers_info': ServerModel.fetch_by_id(self.servers.split(',')) if self.servers else '',
             'commit_id': self.commit_id,
             'branch': self.branch,
             'tag': self.tag,
@@ -357,6 +358,21 @@ class ServerModel(SurrogatePK, Model):
         self.query.filter_by(id=id).delete()
         return db.session.commit()
 
+    @classmethod
+    def fetch_by_id(cls, ids=None):
+        """
+        用户列表
+        :param uids: []
+        :return:
+        """
+        if not ids:
+            return None
+
+        query = ServerModel.query.filter(ServerModel.id.in_(ids))
+        data = query.order_by('id desc').all()
+        return [p.to_json() for p in data]
+
+
     def to_json(self):
         return {
             'id': self.id,
@@ -440,16 +456,7 @@ class ProjectModel(SurrogatePK, Model):
         data = data.to_json()
 
         server_ids = data['server_ids']
-        # return map(int, server_ids.split(','))
-        # with_entities('name')
-        servers = ServerModel().query.filter(ServerModel.id.in_(map(int, server_ids.split(',')))).all()
-        servers_info = []
-        for server in servers:
-            servers_info.append({
-                'id': server.id,
-                'name': server.name,
-            })
-        data['server_ids'] = servers_info
+        data['servers_info'] = ServerModel.fetch_by_id(map(int, server_ids.split(',')))
         return data
 
     def add(self, *args, **kwargs):
