@@ -21,6 +21,8 @@ from werkzeug.utils import secure_filename
 
 
 class PublicAPI(ApiResource):
+    actions = ['menu', 'websocket']
+
     def get(self, action):
         """
         fetch role list or one role
@@ -28,7 +30,7 @@ class PublicAPI(ApiResource):
         :return:
         """
 
-        if action and action in self.action:
+        if action and action in self.actions:
             self_action = getattr(self, action.lower(), None)
             return self_action()
         else:

@@ -15,6 +15,7 @@ from walle.model.deploy import TaskModel
 
 
 class TaskAPI(SecurityResource):
+    actions = ['audit', 'reject']
 
     def get(self, task_id=None):
         """
@@ -82,8 +83,7 @@ class TaskAPI(SecurityResource):
         """
         super(TaskAPI, self).put()
 
-
-        if action and action in self.action:
+        if action and action in self.actions:
             self_action = getattr(self, action.lower(), None)
             return self_action(task_id=task_id)
         else:
@@ -120,7 +120,7 @@ class TaskAPI(SecurityResource):
         """
         task = TaskModel().get_by_id(task_id)
         ret = task.update({'status': TaskModel.status_pass})
-        return True
+        return self.render_json(data=task.item(task_id))
 
     def reject(self, task_id):
         """
@@ -130,4 +130,4 @@ class TaskAPI(SecurityResource):
         """
         task = TaskModel().get_by_id(task_id)
         ret = task.update({'status': TaskModel.status_reject})
-        return True
+        return self.render_json(data=task.item(task_id))

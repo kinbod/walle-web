@@ -9,7 +9,7 @@
 """
 
 
-from flask import request, abort
+from flask import request, abort, current_app
 from flask_login import current_user
 from flask_login import login_user, logout_user
 from walle.api.api import ApiResource
@@ -18,7 +18,7 @@ from walle.model.user import UserModel
 
 
 class PassportAPI(ApiResource):
-    action = ['login', 'logout']
+    actions = ['login', 'logout']
 
     def post(self, action=None):
         """
@@ -28,7 +28,7 @@ class PassportAPI(ApiResource):
         :return:
         """
 
-        if action in self.action:
+        if action in self.actions:
             self_action = getattr(self, action.lower(), None)
             return self_action()
         else:
