@@ -21,6 +21,7 @@ class TaskForm(Form):
     project_id = IntegerField('project_id', [validators.NumberRange(min=1)])
     servers = TextField('servers', [validators.Length(min=1)])
     commit_id = TextField('commit_id', [])
+    status = IntegerField('status', [])
     # TODO 应该增加一个tag/branch其一必填
     tag = TextField('tag', [])
     branch = TextField('branch', [])
@@ -40,7 +41,7 @@ class TaskForm(Form):
             'project_id': self.project_id.data if self.project_id.data else '',
             # todo default value
             'action': 0,
-            'status': 0,
+            'status': self.status.data if self.status.data else 0,
             'link_id': '',
             'ex_link_id': '',
             'servers': self.servers.data if self.servers.data else '',

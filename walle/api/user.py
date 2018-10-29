@@ -82,7 +82,6 @@ class UserAPI(SecurityResource):
             user = UserModel(email=form.email.data,
                              username=form.username.data,
                              password=password,
-                             role_id=form.role_id.data
                              )
             db.session.add(user)
             db.session.commit()
@@ -101,7 +100,7 @@ class UserAPI(SecurityResource):
         form = UserUpdateForm(request.form, csrf_enabled=False)
         if form.validate_on_submit():
             user = UserModel(id=user_id)
-            user.update(username=form.username.data, role_id=form.role_id.data, password=form.password.data)
+            user.update(username=form.username.data, password=form.password.data)
             return self.render_json(data=user.item())
 
         return self.render_json(code=-1, message=form.errors)

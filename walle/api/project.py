@@ -8,13 +8,17 @@
     :author: wushuiyong@walle-web.io
 """
 
-from flask import request
+import json
+
+from flask import request, current_app
 from walle.api.api import SecurityResource
 from walle.form.project import ProjectForm
 from walle.model.deploy import ProjectModel
+from walle.model.user import GroupModel
+
 
 class ProjectAPI(SecurityResource):
-    def get(self, project_id=None):
+    def get(self, action=None, project_id=None):
         """
         fetch project list or one item
         /project/<int:project_id>
@@ -53,7 +57,11 @@ class ProjectAPI(SecurityResource):
         project_info = project_model.item()
         if not project_info:
             return self.render_json(code=-1)
-        return self.render_json(data=project_info)
+
+        group_info = GroupModel(group_id=1).item(project_id=project_id)
+        current_app.logger.info(group_info)
+
+        return self.render_json(data=dict(project_info, **group_info))
 
     def post(self):
         """
@@ -76,7 +84,7 @@ class ProjectAPI(SecurityResource):
         else:
             return self.render_json(code=-1, message=form.errors)
 
-    def put(self, project_id):
+    def put(self, project_id, action=None):
         """
         update environment
         /environment/<int:id>
@@ -84,6 +92,9 @@ class ProjectAPI(SecurityResource):
         :return:
         """
         super(ProjectAPI, self).put()
+
+        if action and action == 'members':
+            return self.members(project_id, members=json.loads(request.data))
 
         form = ProjectForm(request.form, csrf_enabled=False)
         form.set_id(project_id)
@@ -109,3 +120,20 @@ class ProjectAPI(SecurityResource):
         project_model.remove(project_id)
 
         return self.render_json(message='')
+
+    def members(self, project_id, members):
+        """
+
+        :param project_id:
+        :return:
+        """
+        # TODO login for group id
+        group_id = 1
+
+        group_model = GroupModel(group_id=1)
+        ret = group_model.update_project(project_id=project_id, members=members)
+
+        item = group_model.item(project_id=project_id)
+
+        return self.render_json(data=item)
+

@@ -45,3 +45,6 @@ class GroupForm(Form):
         # 新建时,环境名不可与
         if env and env.id != self.group_id:
             raise ValidationError('该用户组已经配置过')
+
+    def validate_members(self, field):
+        pass

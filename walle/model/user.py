@@ -31,7 +31,6 @@ class UserModel(UserMixin, SurrogatePK, Model):
     email = db.Column(String(50), unique=True, nullable=False)
     password = db.Column(String(50), nullable=False)
     avatar = db.Column(String(100))
-    role_id = db.Column(Integer, default=1)
     status = db.Column(Integer, default=1)
     # role_info = relationship("walle.model.user.RoleModel", back_populates="users")
     created_at = db.Column(DateTime, default=current_time)
@@ -52,11 +51,10 @@ class UserModel(UserMixin, SurrogatePK, Model):
         data = self.query.filter_by(id=self.id).first()
         return data.to_json() if data else []
 
-    def update(self, username, role_id, password=None):
+    def update(self, username, password=None):
         # todo permission_ids need to be formated and checked
         user = self.query.filter_by(id=self.id).first()
         user.username = username
-        user.role_id = role_id
         if password:
             user.password = generate_password_hash(password)
 
@@ -157,6 +155,23 @@ class UserModel(UserMixin, SurrogatePK, Model):
         data = query.order_by('id desc').all()
         return [p.to_json() for p in data]
 
+    @classmethod
+    def uid2name(cls, data):
+        """
+        把uid转换成名字
+        :param data: [{'user_id':1, 'xx':'yy'}] 至少包含user_id
+        :return:
+        """
+        user_ids = []
+        uid2name = {}
+        for items in data:
+            user_ids.append(items.user_id)
+        user_info = cls.fetch_by_uid(uids=user_ids)
+
+        for user in user_info:
+            uid2name[user['id']] = user['username']
+        return uid2name
+
     def to_json(self):
         return {
             'id': self.id,
@@ -164,9 +179,10 @@ class UserModel(UserMixin, SurrogatePK, Model):
             'is_email_verified': self.is_email_verified,
             'email': self.email,
             'avatar': self.avatar,
-            'role_id': self.role_id,
+            # TODO 当前登录用户的空间
+            # 'role_id': self.role_id,
             'status': self.status_mapping[self.status],
-            'role_name': self.role_id,
+            # 'role_name': self.role_id,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
         }
@@ -334,9 +350,13 @@ class GroupModel(SurrogatePK, Model):
     # TODO
     # user_ids = db.relationship('walle.model.tag.TagModel', backref=db.backref('users'))
     group_id = db.Column(Integer, db.ForeignKey('tag.id'))
+    project_id = db.Column(Integer, db.ForeignKey('project.id'))
+    role = db.Column(String(30))
     created_at = db.Column(DateTime, default=current_time)
     updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)
     group_name = None
+
+    # TODO group id全局化
 
     def list(self, page=0, size=10, kw=None):
         """
@@ -372,14 +392,20 @@ class GroupModel(SurrogatePK, Model):
         list = [p.to_json() for p in data]
         return list, count
 
-    def add(self, space_name, user_ids):
+    def add(self, space_name, members):
+        """
+
+        :param space_name:
+        :param members: [{'user_id': 1, 'project_id': 2}]
+        :return:
+        """
         tag = TagModel(name=space_name, label='user_group')
         db.session.add(tag)
         db.session.commit()
-        current_app.logger.info(user_ids)
+        current_app.logger.info(members)
 
-        for user_id in user_ids:
-            user_group = GroupModel(group_id=tag.id, user_id=user_id)
+        for member in members:
+            user_group = GroupModel(group_id=tag.id, user_id=member['user_id'], project_id=member['project_id'])
             db.session.add(user_group)
 
         db.session.commit()
@@ -388,32 +414,50 @@ class GroupModel(SurrogatePK, Model):
 
         return tag.id
 
-    def update(self, group_id, group_name, user_ids):
+    def update_group(self, members, group_name=None):
+        current_app.logger.info(members)
         # 修改tag信息
-        tag_model = TagModel.query.filter_by(label='user_group').filter_by(id=group_id).first()
-        if tag_model.name != group_name:
-            tag_model.name = group_name
+        if group_name:
+            tag_model = TagModel.query.filter_by(label='user_group').filter_by(id=self.group_id).first()
+            if tag_model.name != group_name:
+                tag_model.name = group_name
 
         # 修改用户组成员
-        group_model = GroupModel.query.filter_by(group_id=group_id).all()
-        user_exists = []
-        for group in group_model:
-            # 用户组的用户id
-            user_exists.append(group.user_id)
-            # 表里的不在提交中,删除之
-            if group.user_id not in user_ids:
-                GroupModel.query.filter_by(id=group.id).delete()
+        # clean up
+        GroupModel.query.filter_by(group_id=self.group_id).delete()
 
-        # 提交的不在表中的,添加之
-        user_not_in = list(set(user_ids).difference(set(user_exists)))
-        for user_new in user_not_in:
-            group_new = GroupModel(group_id=group_id, user_id=user_new)
-            db.session.add(group_new)
+        # insert all
+        for member in members:
+            tag = GroupModel(user_id=member['user_id'], group_id=self.group_id, role=member['role'])
+            db.session.add(tag)
 
         db.session.commit()
         return self.item()
 
-    def item(self, group_id=None):
+    def update_project(self, project_id, members, group_name=None):
+        group_model = self.item()
+        user_update = []
+
+        current_app.logger.info(members)
+        for member in members:
+            user_update.append(member['user_id'])
+
+        # project新增用户是否在space's group中,无则抛出
+        if list(set(user_update).difference(set(group_model['user_ids']))):
+            raise ValueError('用户不存在')
+
+        # 修改用户组成员
+        # clean up
+        GroupModel.query.filter_by(project_id=project_id).delete()
+
+        # insert all
+        for member in members:
+            group = GroupModel(user_id=member['user_id'], group_id=self.group_id, project_id=project_id, role=member['role'])
+            db.session.add(group)
+
+        return db.session.commit()
+
+    def item(self, group_id=None, project_id=None):
         """
         获取单条记录
         :param role_id:
@@ -427,16 +471,25 @@ class GroupModel(SurrogatePK, Model):
         tag = tag.to_json()
 
         group_id = group_id if group_id else self.group_id
-        groups = GroupModel.query.filter_by(group_id=group_id).all()
+        query = GroupModel.query.filter_by(group_id=group_id)
+        if project_id:
+            query = query.filter_by(project_id=project_id)
+        groups = query.all()
 
         user_ids = []
+        user_role = {}
         for group_info in groups:
             user_ids.append(group_info.user_id)
+            user_role[group_info.user_id] = group_info.role
 
         current_app.logger.info(user_ids)
         user_model = UserModel()
         user_info = user_model.fetch_by_uid(uids=set(user_ids))
         # current_app.logger.info(user_info)
+        if user_info:
+            for user in user_info:
+                if user_role.has_key(user['id']):
+                    user['role'] = user_role[user['id']]
 
 
         tag['user_ids'] = user_ids
@@ -456,7 +509,7 @@ class GroupModel(SurrogatePK, Model):
 
         return group
 
-    def remove(self, group_id=None, user_id=None):
+    def remove(self, group_id=None, user_id=None, project_id=None):
         """
 
         :param role_id:
@@ -468,6 +521,8 @@ class GroupModel(SurrogatePK, Model):
             GroupModel.query.filter_by(user_id=user_id).delete()
         elif self.group_id:
             GroupModel.query.filter_by(group_id=self.group_id).delete()
+        elif project_id:
+            GroupModel.query.filter_by(project_id=project_id).delete()
 
         return db.session.commit()
 
@@ -489,6 +544,7 @@ class SpaceModel(SurrogatePK, Model):
     current_time = datetime.now()
     status_close = 0
     status_open = 1
+
 
     # 表的结构:
     id = db.Column(Integer, primary_key=True, autoincrement=True)
@@ -512,7 +568,9 @@ class SpaceModel(SurrogatePK, Model):
             query = query.filter(SpaceModel.name.like('%' + kw + '%'))
         count = query.count()
         data = query.order_by('id desc').offset(int(size) * int(page)).limit(size).all()
-        list = [p.to_json() for p in data]
+
+        uid2name = UserModel.uid2name(data=data)
+        list = [p.to_json(uid2name) for p in data]
         return list, count
 
     def item(self, id=None):
@@ -522,7 +580,9 @@ class SpaceModel(SurrogatePK, Model):
         :return:
         """
         id = id if id else self.id
-        data = self.query.filter_by(id=id).first()
+        # data = self.query.filter_by(id=id).first()
+
+        return GroupModel(group_id=id).item()
 
         if not data:
             return []
@@ -569,10 +629,11 @@ class SpaceModel(SurrogatePK, Model):
         SpaceModel.query.filter_by(id=space_id).update({'status': self.status_close})
         return db.session.commit()
 
-    def to_json(self):
+    def to_json(self, uid2name=None):
         return {
             'id': self.id,
             'user_id': self.user_id,
+            'user_name': uid2name[self.user_id] if uid2name and uid2name.has_key(self.user_id) else '',
             'group_id': self.group_id,
             'name': self.name,
             'status': self.status,

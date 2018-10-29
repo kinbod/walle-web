@@ -8,10 +8,11 @@
     :author: wushuiyong@walle-web.io
 """
 
-from flask import request
+from flask import request, current_app
 from walle.api.api import SecurityResource
 from walle.form.space import SpaceForm
-from walle.model.user import SpaceModel
+from walle.model.user import SpaceModel, GroupModel
+import json
 
 class SpaceAPI(SecurityResource):
 
@@ -67,12 +68,16 @@ class SpaceAPI(SecurityResource):
         form = SpaceForm(request.form, csrf_enabled=False)
         # return self.render_json(code=-1, data = form.form2dict())
         if form.validate_on_submit():
+            # create space
             space_new = SpaceModel()
             data = form.form2dict()
             id = space_new.add(data)
             if not id:
                 return self.render_json(code=-1)
 
+            current_app.logger.info(request.json)
+            # create group
+            GroupModel(group_id=id).update_group(members=json.loads(request.form['members']))
             return self.render_json(data=space_new.item())
         else:
             return self.render_json(code=-1, message=form.errors)
@@ -85,7 +90,6 @@ class SpaceAPI(SecurityResource):
         :return:
         """
         super(SpaceAPI, self).put()
-
 
         form = SpaceForm(request.form, csrf_enabled=False)
         form.set_id(space_id)

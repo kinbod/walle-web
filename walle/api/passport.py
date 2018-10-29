@@ -20,7 +20,7 @@ from walle.model.user import UserModel
 class PassportAPI(ApiResource):
     action = ['login', 'logout']
 
-    def post(self, method=None):
+    def post(self, action=None):
         """
         user login
         /passport/
@@ -28,9 +28,9 @@ class PassportAPI(ApiResource):
         :return:
         """
 
-        if method in self.action:
-            self_method = getattr(self, method.lower(), None)
-            return self_method()
+        if action in self.action:
+            self_action = getattr(self, action.lower(), None)
+            return self_action()
         else:
             abort(404)
 

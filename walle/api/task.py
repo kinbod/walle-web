@@ -8,7 +8,7 @@
     :author: wushuiyong@walle-web.io
 """
 
-from flask import request
+from flask import request, current_app, abort
 from walle.api.api import SecurityResource
 from walle.form.task import TaskForm
 from walle.model.deploy import TaskModel
@@ -55,8 +55,8 @@ class TaskAPI(SecurityResource):
 
     def post(self):
         """
-        create a environment
-        /environment/
+        create a task
+        /task/
         :return:
         """
         super(TaskAPI, self).post()
@@ -74,21 +74,25 @@ class TaskAPI(SecurityResource):
         else:
             return self.render_json(code=-1, message=form.errors)
 
-    def put(self, task_id):
+    def put(self, task_id, action=None):
         """
-        update environment
-        /environment/<int:id>
+        update task
+        /task/<int:id>
         :return:
         """
         super(TaskAPI, self).put()
 
+
+        if action and action in self.action:
+            self_action = getattr(self, action.lower(), None)
+            return self_action(task_id=task_id)
+        else:
+            abort(404)
         form = TaskForm(request.form, csrf_enabled=False)
-        f = open('run.log', 'w')
         form.set_id(task_id)
         if form.validate_on_submit():
             task = TaskModel().get_by_id(task_id)
             data = form.form2dict()
-            f.write('\n====form2dict===\n' + str(data))
             # a new type to update a model
             ret = task.update(data)
             return self.render_json(data=task.item())
@@ -97,8 +101,8 @@ class TaskAPI(SecurityResource):
 
     def delete(self, task_id):
         """
-        remove an environment
-        /environment/<int:id>
+        remove an task
+        /task/<int:id>
         :return:
         """
         super(TaskAPI, self).delete()
@@ -107,3 +111,23 @@ class TaskAPI(SecurityResource):
         task_model.remove(task_id)
 
         return self.render_json(message='')
+
+    def audit(self, task_id):
+        """
+        审核任务
+        :param task_id:
+        :return:
+        """
+        task = TaskModel().get_by_id(task_id)
+        ret = task.update({'status': TaskModel.status_pass})
+        return True
+
+    def reject(self, task_id):
+        """
+        审核任务
+        :param task_id:
+        :return:
+        """
+        task = TaskModel().get_by_id(task_id)
+        ret = task.update({'status': TaskModel.status_reject})
+        return True

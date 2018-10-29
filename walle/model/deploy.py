@@ -5,7 +5,7 @@
 # @Description:
 
 from sqlalchemy import String, Integer, Text, DateTime
-
+from flask import current_app
 # from flask_cache import Cache
 from datetime import datetime
 
@@ -19,6 +19,12 @@ from walle.model.user import UserModel
 class TaskModel(SurrogatePK, Model):
     __tablename__ = 'task'
     current_time = datetime.now()
+    # 状态0：新建提交，1审核通过，2审核拒绝，3上线完成，4上线失败
+    status_new = 0
+    status_pass = 1
+    status_reject = 2
+    status_success = 3
+    status_fail = 4
 
     # 表的结构:
     id = db.Column(Integer, primary_key=True, autoincrement=True)

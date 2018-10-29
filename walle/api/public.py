@@ -9,7 +9,7 @@
 """
 
 import os
-from flask import request
+from flask import request,abort
 from walle.api.api import ApiResource
 from walle.model.deploy import TaskRecordModel
 from walle.model.user import AccessModel
@@ -21,36 +21,27 @@ from werkzeug.utils import secure_filename
 
 
 class PublicAPI(ApiResource):
-    def get(self, method):
+    def get(self, action):
         """
         fetch role list or one role
 
         :return:
         """
-        if method == 'menu':
-            return self.menu()
-        elif method == 'mail':
-            return self.mail()
-        elif method == 'websocket':
-            import time
-            time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-            cmd = request.args.get('cmd', ' command')
 
-            self.walle(12)
-            WSHandler.send_updates('%s %s' % (time, cmd))
-            return self.render_json(data={
-                'command': 'xxx',
-                'record': 'xxx',
-            })
-            # return render_template('websocket.html')
+        if action and action in self.action:
+            self_action = getattr(self, action.lower(), None)
+            return self_action()
+        else:
+            abort(404)
 
-    def post(self, method):
+
+    def post(self, action):
         """
         fetch role list or one role
 
         :return:
         """
-        if method == 'avater':
+        if action == 'avater':
             return self.avater()
 
     def menu(self):
@@ -82,8 +73,8 @@ class PublicAPI(ApiResource):
             'done': ret,
         })
 
-    def walle(self, task_id):
-
+    def websocket(self, task_id=None):
+        task_id = 12
         wi = Deployer(task_id)
         ret = wi.walle_deploy()
         record = TaskRecordModel().fetch(task_id)

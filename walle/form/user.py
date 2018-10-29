@@ -30,28 +30,16 @@ class RegistrationForm(Form):
                                           validators.Regexp(regex="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}",
                               message='密码至少6个字符，至少1个大写字母，1个小写字母，1个数字')])
 
-    role_id = TextField('Password', [validators.Length(min=1, max=10)])
     username = TextField('Username', [validators.Length(min=1, max=50)])
 
     def validate_email(self, field):
         if UserModel.query.filter_by(email=field.data).first():
             raise ValidationError('Email already register')
 
-    def validate_role_id(self, field):
-        if not RoleModel.query.filter_by(id=field.data).first():
-            raise ValidationError('Email already register')
-
 
 class UserUpdateForm(Form):
     password = PasswordField('Password', [])
     username = TextField('username', [validators.Length(min=1, max=50)])
-    role_id = TextField('role_id', [validators.Length(min=1, max=10)])
-
-
-    def validate_role_id(self, field):
-        if not RoleModel.query.filter_by(id=field.data).first():
-            raise ValidationError('角色id不存在')
-
     def validate_password(self, field):
         if field.data and not re.match("^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,}", field.data):
             raise ValidationError('密码至少6个字符，至少1个大写字母，1个小写字母，1个数字')

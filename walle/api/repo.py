@@ -7,13 +7,13 @@
     :created time: 2017-03-25 11:15:01
     :author: wushuiyong@walle-web.io
 """
-from flask import request
+from flask import request, abort
 from walle.api.api import SecurityResource
 from walle.service.deployer import Deployer
 
 
 class RepoAPI(SecurityResource):
-    def get(self, method, commit=None):
+    def get(self, action, commit=None):
         """
         fetch project list or one item
         /project/<int:project_id>
@@ -22,15 +22,15 @@ class RepoAPI(SecurityResource):
         """
         super(RepoAPI, self).get()
         project_id = request.args.get('project_id', '')
+        branch = request.args.get('branch', '')
 
-        if method == 'tags':
-            return self.tags(project_id=project_id)
-        elif method == 'branches':
-            return self.branches(project_id=project_id)
-        elif method == 'commits':
-            branch = request.args.get('branch', '')
-            return self.commits(project_id=project_id, branch=branch)
-        return self.list_json(list=[])
+
+        if action and action in self.action:
+            self_action = getattr(self, action.lower(), None)
+            return self_action(project_id=project_id, branch=branch)
+        else:
+            abort(404)
+
 
     def tags(self, project_id=None):
         """
