@@ -30,7 +30,7 @@ class PublicAPI(ApiResource):
         :return:
         """
 
-        if action and action in self.actions:
+        if action in self.actions:
             self_action = getattr(self, action.lower(), None)
             return self_action()
         else:

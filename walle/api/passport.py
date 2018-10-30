@@ -20,7 +20,7 @@ from walle.model.user import UserModel
 class PassportAPI(ApiResource):
     actions = ['login', 'logout']
 
-    def post(self, action=None):
+    def post(self, action):
         """
         user login
         /passport/

@@ -5,13 +5,15 @@ import types
 import urllib
 import pytest
 from utils import *
-
+from walle.model.deploy import TaskModel
 
 class TestApiTask:
     """api role testing"""
     uri_prefix = '/api/task'
 
     server_id = {}
+
+    # TODO 需要再准备一个是否需要开启审核的status单测
 
     task_data = {
         'name': u'提交一个测试上线单',
@@ -29,7 +31,7 @@ class TestApiTask:
     task_data_2 = {
         'name': u'The Second Bill',
         'project_id': 1,
-        'servers': u'127.0.0.1,192.168.0.1',
+        'servers': u'1,2',
         'commit_id': u'a89eb23c',
         'branch': u'master',
         'file_transmission_mode': 0,
@@ -39,7 +41,7 @@ class TestApiTask:
     task_data_2_update = {
         'name': u'The Second Bill Edit',
         'project_id': 1,
-        'servers': u'127.0.0.1,192.168.0.1,11.22.33.44',
+        'servers': u'1,2',
         'commit_id': u'a89eb23c',
         'branch': u'master',
         'file_transmission_mode': 0,
@@ -49,7 +51,7 @@ class TestApiTask:
     task_data_remove = {
         'name': u'A Task To Be Removed',
         'project_id': 1,
-        'servers': u'127.0.0.1,192.168.0.1,127.0.0.1,192.168.0.1,127.0.0.1,192.168.0.1',
+        'servers': u'1,2,3',
         'commit_id': u'a89eb23c',
         'branch': u'master',
         'file_transmission_mode': 0,
@@ -66,8 +68,6 @@ class TestApiTask:
 
         self.task_data['id'] = resp_json(resp)['data']['id']
 
-        f = open('run.log', 'w')
-        f.write(str(self.task_data_2))
         # 2.create another role
         resp = client.post('%s/' % (self.uri_prefix), data=self.task_data_2)
 
@@ -132,13 +132,28 @@ class TestApiTask:
         response_success(resp)
         compare_req_resp(self.task_data_2_update, resp)
 
+    def test_get_update_audit(self, user, testapp, client):
+        """Login successful."""
+        # 1.update
+        resp = client.put('%s/%d/audit' % (self.uri_prefix, self.task_data_2['id']))
+
+        response_success(resp)
+        assert resp_json(resp)['data']['status'] == TaskModel.status_pass
+
+    def test_get_update_reject(self, user, testapp, client):
+        """Login successful."""
+        # 1.update
+        resp = client.put('%s/%d/reject' % (self.uri_prefix, self.task_data_2['id']))
+
+        response_success(resp)
+        assert resp_json(resp)['data']['status'] == TaskModel.status_reject
+
+
     def test_get_remove(self, user, testapp, client):
         """Login successful."""
         # 1.create another role
         resp = client.post('%s/' % (self.uri_prefix), data=self.task_data_remove)
         server_id = resp_json(resp)['data']['id']
-        f = open('run.log', 'w')
-        f.write(str(resp_json(resp)))
         response_success(resp)
 
         # 2.delete

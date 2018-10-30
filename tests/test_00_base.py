@@ -11,7 +11,6 @@ user_data_login = {
     'username': u'wushuiyong',
     'email': u'wushuiyong@walle-web.io',
     'password': u'WU123shuiyong',
-    'role_id': 1,
 }
 
 
@@ -513,16 +512,6 @@ class TestAccess:
                     fe_visible=asscess_data['fe_visible']
             )
             access.save()
-
-
-class TestRole:
-    def test_add(self):
-        role = RoleModel(
-                name=u'研发',
-                access_ids=u'1,2,3,11,12,13,14,15,16,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124'
-        )
-        role.save()
-
 
 class TestUser:
     user_data_login = deepcopy(user_data_login)

@@ -40,8 +40,6 @@ class TestLoginForm:
         # user.save()
         # form = LoginForm(email=u'test01@walle-web.io', password=u'walle987&^*')
         # form.validate()
-        # f = open('run.log', 'w')
-        # f.write(str(form.errors))
         pass
 
         # assert form.validate() is True

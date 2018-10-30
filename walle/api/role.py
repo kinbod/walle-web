@@ -18,7 +18,7 @@ class RoleAPI(SecurityResource):
     角色模型跟gitlab一样,分别是超管,空间所有者,项目管理员,开发者,访客
     """
 
-    def list(self):
+    def get(self):
         """
         fetch role list
         /role/

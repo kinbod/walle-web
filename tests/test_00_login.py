@@ -20,9 +20,7 @@ class TestApiPassport:
 
 
     def test_fetch(self):
-        f = open('run.log', 'w')
         u = UserModel.get_by_id(1)
-        f.write(str(u))
 
     def test_login(self, user, testapp, client, db):
         """create successful."""

@@ -26,7 +26,7 @@ class RepoAPI(SecurityResource):
         project_id = request.args.get('project_id', '')
         branch = request.args.get('branch', '')
 
-        if action and action in self.actions:
+        if action in self.actions:
             self_action = getattr(self, action.lower(), None)
             return self_action(project_id=project_id, branch=branch)
         else:

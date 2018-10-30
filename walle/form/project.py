@@ -20,7 +20,7 @@ from walle.model.deploy import ProjectModel
 class ProjectForm(Form):
     name = TextField('name', [validators.Length(min=1, max=100)])
     environment_id = TextField('environment_id', [validators.Length(min=1, max=10)])
-    status = TextField('status', [validators.Length(min=1, max=10)])
+    status = TextField('status', [])
     excludes = TextField('excludes', [])
     master = TextField('master', [])
     server_ids = TextField('server_ids', [validators.Length(min=1)])
@@ -43,7 +43,7 @@ class ProjectForm(Form):
     repo_mode = TextField('repo_mode', [validators.Length(min=1, max=50)])
     notice_type = TextField('notice_type', [])
     notice_hook = TextField('notice_hook', [])
-    enable_audit = TextField('enable_audit', [validators.Length(min=1, max=10)])
+    enable_audit = TextField('enable_audit', [])
 
     id = None
 

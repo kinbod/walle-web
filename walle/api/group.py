@@ -80,7 +80,7 @@ class GroupAPI(SecurityResource):
         user_info = user_model.fetch_by_uid(uids=group_model.users)
 
         group_info = group_model.to_dict()
-        group_info['user_info'] = user_info
+        group_info['members'] = user_info
         group_info['users'] = len(user_info)
         group_info['group_name'] = group_info['name']
         group_info['group_id'] = group_info['id']

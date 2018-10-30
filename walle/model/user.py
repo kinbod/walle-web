@@ -174,7 +174,8 @@ class UserModel(UserMixin, SurrogatePK, Model):
 
     def to_json(self):
         return {
-            'id': self.id,
+            'id': int(self.id),
+            'user_id': int(self.id),
             'username': self.username,
             'is_email_verified': self.is_email_verified,
             'email': self.email,
@@ -493,7 +494,7 @@ class GroupModel(SurrogatePK, Model):
 
 
         tag['user_ids'] = user_ids
-        tag['user_info'] = user_info
+        tag['members'] = user_info
         tag['users'] = len(user_ids)
         return tag
 

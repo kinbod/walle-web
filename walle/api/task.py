@@ -83,11 +83,16 @@ class TaskAPI(SecurityResource):
         """
         super(TaskAPI, self).put()
 
-        if action and action in self.actions:
-            self_action = getattr(self, action.lower(), None)
-            return self_action(task_id=task_id)
+        if action:
+            if action in self.actions:
+                self_action = getattr(self, action.lower(), None)
+                return self_action(task_id=task_id)
+            else:
+                abort(404)
         else:
-            abort(404)
+            return self.update(task_id=task_id)
+
+    def update(self, task_id):
         form = TaskForm(request.form, csrf_enabled=False)
         form.set_id(task_id)
         if form.validate_on_submit():

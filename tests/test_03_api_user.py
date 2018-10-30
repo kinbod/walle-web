@@ -9,7 +9,6 @@ from utils import *
 user_data = {
     'email': u'test01@walle-web.io',
     'password': u'Walle987',
-    'role_id': 1,
     'username': u'测试用户',
 }
 
@@ -28,21 +27,18 @@ class TestApiUser:
     user_data_error = {
         'email': u'user_error@walle-web.io',
         'password': u'walle99',
-        'role_id': 1,
         'username': u'Tester',
     }
 
     user_data_2 = {
         'email': u'test02@walle-web.io',
         'password': u'Walle99999',
-        'role_id': 1,
         'username': u'Tester',
     }
 
     user_data_remove = {
         'email': u'test03@walle-web.io',
         'password': u'Walle987&^*',
-        'role_id': 1,
         'username': u'test_remove',
     }
 
