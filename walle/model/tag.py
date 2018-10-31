@@ -13,7 +13,7 @@ from walle.model.database import SurrogatePK, db, Model
 
 class TagModel(SurrogatePK, Model):
     # 表的名字:
-    __tablename__ = 'tag'
+    __tablename__ = 'tags'
 
     current_time = datetime.now()
 

@@ -17,7 +17,7 @@ from walle.model.user import UserModel
 
 # 上线单
 class TaskModel(SurrogatePK, Model):
-    __tablename__ = 'task'
+    __tablename__ = 'tasks'
     current_time = datetime.now()
     # 状态0：新建提交，1审核通过，2审核拒绝，3上线完成，4上线失败
     status_new = 0
@@ -161,7 +161,7 @@ class TaskModel(SurrogatePK, Model):
 # 上线记录表
 class TaskRecordModel(db.Model):
     # 表的名字:
-    __tablename__ = 'task_record'
+    __tablename__ = 'task_records'
     current_time = datetime.now()
 
     # 表的结构:
@@ -211,7 +211,7 @@ class TaskRecordModel(db.Model):
 # 环境级别
 class EnvironmentModel(db.Model):
     # 表的名字:
-    __tablename__ = 'environment'
+    __tablename__ = 'environments'
 
     status_open = 1
     status_close = 2
@@ -290,7 +290,7 @@ class EnvironmentModel(db.Model):
 
 # server
 class ServerModel(SurrogatePK, Model):
-    __tablename__ = 'server'
+    __tablename__ = 'servers'
 
     current_time = datetime.now()
 
@@ -392,7 +392,7 @@ class ServerModel(SurrogatePK, Model):
 # 项目配置表
 class ProjectModel(SurrogatePK, Model):
     # 表的名字:
-    __tablename__ = 'project'
+    __tablename__ = 'projects'
     current_time = datetime.now()
     status_close = 0
     status_open = 1
@@ -529,7 +529,7 @@ class ProjectModel(SurrogatePK, Model):
 
 class TagModel(SurrogatePK, Model):
     # 表的名字:
-    __tablename__ = 'tag'
+    __tablename__ = 'tags'
 
     current_time = datetime.now()
 

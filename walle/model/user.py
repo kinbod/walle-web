@@ -20,7 +20,7 @@ from flask import current_app
 
 class UserModel(UserMixin, SurrogatePK, Model):
     # 表的名字:
-    __tablename__ = 'user'
+    __tablename__ = 'users'
 
     current_time = datetime.now()
     password_hash = 'sadfsfkk'
@@ -215,8 +215,6 @@ class AccessModel(SurrogatePK, Model):
     updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)
 
     def menu(self, role):
-        role_id = 1
-        role = RoleModel(id=role_id).item()
         data = {}
 
         query = self.query.filter_by(fe_visible=1) \
@@ -347,11 +345,11 @@ class GroupModel(SurrogatePK, Model):
 
     # 表的结构:
     id = db.Column(Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(Integer, db.ForeignKey('users.id'))
     # TODO
     # user_ids = db.relationship('walle.model.tag.TagModel', backref=db.backref('users'))
-    group_id = db.Column(Integer, db.ForeignKey('tag.id'))
-    project_id = db.Column(Integer, db.ForeignKey('project.id'))
+    group_id = db.Column(Integer, db.ForeignKey('tags.id'))
+    project_id = db.Column(Integer, db.ForeignKey('projects.id'))
     role = db.Column(String(30))
     created_at = db.Column(DateTime, default=current_time)
     updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)
@@ -541,7 +539,7 @@ class GroupModel(SurrogatePK, Model):
 # 项目配置表
 class SpaceModel(SurrogatePK, Model):
     # 表的名字:
-    __tablename__ = 'space'
+    __tablename__ = 'spaces'
     current_time = datetime.now()
     status_close = 0
     status_open = 1
