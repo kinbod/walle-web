@@ -12,7 +12,7 @@ import os
 from flask import request,abort
 from walle.api.api import ApiResource
 from walle.model.deploy import TaskRecordModel
-from walle.model.user import AccessModel
+from walle.model.user import MenuModel
 from walle.model.user import UserModel
 from walle.service import emails
 from walle.service.deployer import Deployer
@@ -20,7 +20,7 @@ from walle.service.websocket import WSHandler
 from werkzeug.utils import secure_filename
 
 
-class PublicAPI(ApiResource):
+class GeneralAPI(ApiResource):
     actions = ['menu', 'websocket']
 
     def get(self, action):
@@ -47,11 +47,17 @@ class PublicAPI(ApiResource):
             return self.avater()
 
     def menu(self):
+        role = 10
         user = UserModel(id=1).item()
-        menu = AccessModel().menu('x')
+        menu = MenuModel().menu(role=role)
+        space = {
+            'current': {'id': 1, 'name': '大数据'},
+            'available': [{'id': 2, 'name': '瓦力'}, {'id': 3, 'name': '瓦尔登'}]
+        }
         data = {
             'user': user,
             'menu': menu,
+            'space': space,
         }
         return self.render_json(data=data)
 

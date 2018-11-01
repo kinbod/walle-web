@@ -2,7 +2,7 @@
 """Model unit tests."""
 
 import pytest
-from walle.model.user import AccessModel
+from walle.model.user import MenuModel
 from walle.model.user import RoleModel
 from walle.model.user import UserModel
 from werkzeug.security import generate_password_hash
@@ -38,8 +38,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-11 23:11:38",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 1,
                 "name_cn": u"用户中心",
@@ -52,8 +52,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-11 23:11:52",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 2,
                 "name_cn": u"配置中心",
@@ -66,8 +66,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-11 23:12:45",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 3,
                 "name_cn": u"上线单",
@@ -80,8 +80,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-11 23:13:51",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 11,
                 "name_cn": u"用户管理",
@@ -94,8 +94,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-11 23:14:11",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 12,
                 "name_cn": u"用户组",
@@ -108,8 +108,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-11 23:14:44",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 13,
                 "name_cn": u"角色",
@@ -122,8 +122,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-11 23:15:30",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 14,
                 "name_cn": u"环境管理",
@@ -136,8 +136,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-11 23:15:51",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 15,
                 "name_cn": u"服务器管理",
@@ -150,8 +150,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-11 23:16:18",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 16,
                 "name_cn": u"项目管理",
@@ -164,8 +164,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-11 23:17:12",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 101,
                 "name_cn": u"查看",
@@ -178,8 +178,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-11 23:17:26",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 102,
                 "name_cn": u"修改",
@@ -192,8 +192,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-11 23:17:59",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 103,
                 "name_cn": u"新增",
@@ -206,8 +206,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-11 23:18:16",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 104,
                 "name_cn": u"删除",
@@ -220,8 +220,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:14:56",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 105,
                 "name_cn": u"查看",
@@ -234,8 +234,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:14:56",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 106,
                 "name_cn": u"修改",
@@ -248,8 +248,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:14:56",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 107,
                 "name_cn": u"新增",
@@ -262,8 +262,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:14:56",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 108,
                 "name_cn": u"删除",
@@ -276,8 +276,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:15:22",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 109,
                 "name_cn": u"查看",
@@ -290,8 +290,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:15:22",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 110,
                 "name_cn": u"修改",
@@ -304,8 +304,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:15:22",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 111,
                 "name_cn": u"新增",
@@ -318,8 +318,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:15:22",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 112,
                 "name_cn": u"删除",
@@ -332,8 +332,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:15:40",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 113,
                 "name_cn": u"查看",
@@ -346,8 +346,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:15:40",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 114,
                 "name_cn": u"修改",
@@ -360,8 +360,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:15:40",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 115,
                 "name_cn": u"新增",
@@ -374,8 +374,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:15:40",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 116,
                 "name_cn": u"删除",
@@ -388,8 +388,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:16:21",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 117,
                 "name_cn": u"查看",
@@ -402,8 +402,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:16:21",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 118,
                 "name_cn": u"修改",
@@ -416,8 +416,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:16:21",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 119,
                 "name_cn": u"新增",
@@ -430,8 +430,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:16:21",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 120,
                 "name_cn": u"删除",
@@ -444,8 +444,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:16:42",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 121,
                 "name_cn": u"查看",
@@ -458,8 +458,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:16:42",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 122,
                 "name_cn": u"修改",
@@ -472,8 +472,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:16:42",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 123,
                 "name_cn": u"新增",
@@ -486,8 +486,8 @@ class TestAccess:
             {
                 "archive": 0,
                 "created_at": u"2017-06-19 08:16:42",
-                "fe_url": u"xx.yy.zz",
-                "fe_visible": 1,
+                "url": u"xx.yy.zz",
+                "visible": 1,
                 "icon": u"leaf",
                 "id": 124,
                 "name_cn": u"删除",
@@ -499,7 +499,7 @@ class TestAccess:
             }
         ]
         for asscess_data in access_list:
-            access = AccessModel(
+            access = MenuModel(
                     id=asscess_data['id'],
                     name_cn=asscess_data['name_cn'],
                     name_en=asscess_data['name_en'],
@@ -508,8 +508,8 @@ class TestAccess:
                     sequence=asscess_data['sequence'],
                     archive=asscess_data['archive'],
                     icon=asscess_data['icon'],
-                    fe_url=asscess_data['fe_url'],
-                    fe_visible=asscess_data['fe_visible']
+                    url=asscess_data['url'],
+                    visible=asscess_data['visible']
             )
             access.save()
 

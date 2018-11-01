@@ -11,7 +11,7 @@
 from flask import request
 
 from walle.api.api import SecurityResource
-from walle.model.user import AccessModel
+from walle.model.user import MenuModel
 from walle.model.user import RoleModel
 
 
@@ -40,7 +40,7 @@ class AccessAPI(SecurityResource):
         :return:
         """
 
-        access_model = AccessModel()
+        access_model = MenuModel()
         access_list = access_model.list()
         return self.render_json(data=access_list)
 
@@ -52,7 +52,7 @@ class AccessAPI(SecurityResource):
         :return:
         """
         access_info = RoleModel().list(size=1000)
-        data = AccessModel.query.all()
+        data = MenuModel.query.all()
         list = [p.to_json() for p in data]
         return self.render_json(data=list)
 

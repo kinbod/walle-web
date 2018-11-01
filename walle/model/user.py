@@ -94,9 +94,9 @@ class UserModel(UserMixin, SurrogatePK, Model):
         return generate_password_hash(password)
 
     def fetch_access_list_by_role_id(self, role_id):
-        module = aliased(AccessModel)
-        controller = aliased(AccessModel)
-        action = aliased(AccessModel)
+        module = aliased(MenuModel)
+        controller = aliased(MenuModel)
+        action = aliased(MenuModel)
         role = RoleModel.query.get(role_id)
         access_ids = role.access_ids.split(',')
 
@@ -104,7 +104,7 @@ class UserModel(UserMixin, SurrogatePK, Model):
             .query(controller.name_en, controller.name_cn,
                    action.name_en, action.name_cn) \
             .outerjoin(action, action.pid == controller.id) \
-            .filter(module.type == AccessModel.type_module) \
+            .filter(module.type == MenuModel.type_module) \
             .filter(controller.id.in_(access_ids)) \
             .filter(action.id.in_(access_ids)) \
             .all()
@@ -189,8 +189,8 @@ class UserModel(UserMixin, SurrogatePK, Model):
         }
 
 
-class AccessModel(SurrogatePK, Model):
-    __tablename__ = 'access'
+class MenuModel(SurrogatePK, Model):
+    __tablename__ = 'menus'
 
     type_module = 'module'
     type_controller = 'controller'
@@ -209,32 +209,37 @@ class AccessModel(SurrogatePK, Model):
     sequence = db.Column(Integer)
     archive = db.Column(Integer)
     icon = db.Column(String(30))
-    fe_url = db.Column(String(30))
-    fe_visible = db.Column(Integer)
+    url = db.Column(String(30))
+    visible = db.Column(Integer)
+    role = db.Column(Integer)
     created_at = db.Column(DateTime, default=current_time)
     updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)
 
     def menu(self, role):
         data = {}
-
-        query = self.query.filter_by(fe_visible=1) \
-            .filter(AccessModel.type.in_((self.type_module, self.type_controller))) \
-            .filter(AccessModel.id.in_(role['access_ids'].split(','))) \
+        filters = {
+             MenuModel.visible == 1,
+             MenuModel.role >= role
+        }
+        query = self.query \
+            .filter(*filters) \
             .order_by('sequence asc') \
             .all()
         for item in query:
             if item.type == self.type_module:
-                data[item.id] = {
+                module = {
                     'title': item.name_cn,
                     'icon': item.icon,
+                    'sub_menu': [],
                 }
+                if item.url:
+                    module['url'] = item.url
+                data[item.id] = module
             elif item.type == self.type_controller:
-                if not data[item.pid].has_key('sub_menu'):
-                    data[item.pid]['sub_menu'] = []
                 data[item.pid]['sub_menu'].append({
                     'title': item.name_cn,
                     'icon': item.icon,
-                    'fe_url': item.fe_url,
+                    'url': item.url,
                 })
 
         return data.values()
@@ -249,9 +254,9 @@ class AccessModel(SurrogatePK, Model):
         """
         menus_module = {}
         menus_controller = {}
-        module = aliased(AccessModel)
-        controller = aliased(AccessModel)
-        action = aliased(AccessModel)
+        module = aliased(MenuModel)
+        controller = aliased(MenuModel)
+        action = aliased(MenuModel)
 
         data = db.session.query(module.id, module.name_cn, controller.id, controller.name_cn, action.id, action.name_cn) \
             .outerjoin(controller, controller.pid == module.id) \
@@ -303,8 +308,8 @@ class AccessModel(SurrogatePK, Model):
             'sequence': self.sequence,
             'archive': self.archive,
             'icon': self.icon,
-            'fe_url': self.fe_url,
-            'fe_visible': self.fe_visible,
+            'url': self.url,
+            'visible': self.visible,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S'),
         }
@@ -335,6 +340,27 @@ class RoleModel(object):
     @classmethod
     def item(cls, role_id):
         return None
+
+
+# 项目配置表
+class MemberModel(SurrogatePK, Model):
+    __tablename__ = 'members'
+
+    current_time = datetime.now()
+
+    # 表的结构:
+    id = db.Column(Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(Integer, db.ForeignKey('users.id'))
+    source_id = db.Column(Integer)
+    source_type = db.Column(Integer)
+    access_level = db.Column(Integer)
+    created_at = db.Column(DateTime, default=current_time)
+    updated_at = db.Column(DateTime, default=current_time, onupdate=current_time)
+    group_name = None
+
+    def list(self):
+        pass
+
 
 
 # 项目配置表
@@ -543,7 +569,6 @@ class SpaceModel(SurrogatePK, Model):
     current_time = datetime.now()
     status_close = 0
     status_open = 1
-
 
     # 表的结构:
     id = db.Column(Integer, primary_key=True, autoincrement=True)
