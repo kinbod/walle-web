@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+</head>
+<style>
+    #solo {
+        width: 800px;
+    }
+</style>
+<p>Flask SocketIO</p>
+<div id="solo">
+    welcome to walle 2.0
+</div>
+<br>
+
+<button id="branch" type="button">Branch</button>
+<br>
+
+<button id="tag" type="button">Tag</button>
+<br>
+
+<button id="commit" type="button">Commit</button>
+<br>
+
+<input id="say" type="text"><button id="send" type="button">Send!</button>
+
+<body>
+<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="/socket.io.min.js"></script>
+<script>
+    $(document).ready(function () {
+        namespace = '/walle'
+        solo = $('#solo')
+
+        var socket = io.connect('http://' + document.domain + namespace);
+        post = {
+            'task': 12
+        }
+
+        /// 返回基本结构: emit('construct', {
+        ///                      'event': 'pusher:construct',
+        ///                       'data': {"status":0,"success":"","sequence":1,"cmd":"python --version","host":"127.0.0.1","error":""}
+        ///                  })
+        ///
+        ///     1 页面刷新时,任务已经部署中
+        ///         a.前端获取历史
+        ///         b.前端接受server端的console
+        ///     2 页面刷新时,任务未开始，点「开始」时已在其它窗口开始部署
+        ///         a.后端不会重新开始这个任务
+        ///         b.前端接受server端的console
+        ///     3 页面刷新时,任务已经部署成功
+        ///         a.前端获取历史
+        ///     4 页面刷新时,任务已经部署失败
+        ///         a.前端获取历史
+        ///         b.前端可高亮「开始」, 用户继续重新部署
+        ///
+        ///     client              server
+        ///     -------------|------------
+        ///     connect      ->
+        ///                         open
+        ///     construct    <-
+        ///                  ->
+        ///     console      <-     deploy
+        ///     console      <-
+        ///
+        ///     获取历史日志
+        ///     client              server
+        ///     -------------|------------
+        ///     connect      ->
+        ///                         open
+        ///     construct    <-
+        ///                  ->
+        ///     console      <-     logs
+        ///     console      <-
+        ///
+
+        // 1.发起连接, 连上之后发起open
+        socket.on('connect', function (data) {
+            write(data)
+            socket.emit('open', post);
+        });
+        // 2.返回construct, 初始化页面信息
+        socket.on('construct', function (data) {
+{#            write(data)#}
+            socket.emit('logs', {'task': 12})
+        });
+
+        // 3.发送deploy命令之后, 将会收到console
+        socket.on('console', function (data) {
+            write(data)
+        });
+
+        socket.on('close', function (data) {
+            write(data)
+            socket.close()
+        });
+
+        function write(data) {
+            console.log(data)
+            if (!data) {
+                return ''
+            }
+            msg = JSON.stringify(data);
+            solo.html(solo.html() + '<br>' + msg);
+        }
+
+{#        window.setInterval(function() {#}
+{#            start_time = (new Date).getTime();#}
+{#            socket.emit('ping', {'start_time': start_time});#}
+{#        }, 10000);#}
+
+        socket.on('pong', function(data) {
+            write(data)
+        });
+        socket.on('branches', function(data) {
+            write(data)
+        });
+        socket.on('tags', function(data) {
+            write(data)
+        });
+        socket.on('commits', function(data) {
+            write(data)
+        });
+
+
+        $('#branch').click(function(e) {
+            socket.emit('branches', {});
+        })
+
+        $('#tag').click(function(e) {
+            socket.emit('tags', {});
+        })
+
+        $('#commit').click(function(e) {
+            socket.emit('commits', {'branch': 'master'});
+        })
+
+        $(document).keyup(function (event) {
+            if (event.keyCode == 13) {
+                $("#send").trigger("click");
+                task = $('#say').val();
+                socket.emit('deploy', {'task': task});
+                $('#say').val('')
+            }
+        });
+    });
+
+</script>
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?2ef62756e9f3268b17d316a6f6f5a4a0";
+  var s = document.getElementsByTagName("script")[0];
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</body>
+</html>

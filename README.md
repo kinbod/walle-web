@@ -1,176 +1,109 @@
-![](https://raw.github.com/meolu/walle-web/master/docs/logo.jpg)
+![](https://raw.github.com/meolu/walle-web/master/screenshot/logo.jpg)
 
-Walle - A Deployment Tool
+Walle 2.0 - [官方主页](https://www.walle-web.io)
 =========================
-
 [![Build Status](https://travis-ci.org/meolu/walle-web.svg?branch=master)](https://travis-ci.org/meolu/walle-web)
-[![Packagist](https://img.shields.io/packagist/v/meolu/walle-web.svg)](https://packagist.org/packages/meolu/walle-web)
-[![Yii2](https://img.shields.io/badge/Powered_by-Yii_Framework-green.svg?style=flat)](http://www.yiiframework.com/)
 
-:clap: :clap: :clap: :clap: :clap:
+功能强大，且免费开源的`walle-web 瓦力`终于更新`2.0.0`了！！！
 
-**Now, Walle-web 2.0 is developing and testing, if you are interested in 2.0, you can add wechat: wu-shuiyong with your name and company, for more infomation or a trial edition, thank you : )**
+walle 让用户代码发布终于可以不只能选择 jenkins！支持各种web代码发布，php、java、python、go等代码的发布、回滚可以通过web来一键完成。walle 一个可自由配置项目，更人性化，高颜值，支持git、多用户、多语言、多项目、多环境同时部署的开源上线部署系统。
 
-A web deployment tool, Easy for configuration, Fully functional, Smooth interface, Out of the box.
-support git/svn Version control system, no matter what language you are, php/java/ruby/python, just as jenkins. you can deploy the code or output to multiple servers easily by walle.
-
-[Home Page](https://www.walle-web.io) | [官方主页](https://www.walle-web.io) | [中文说明](https://github.com/meolu/walle-web/blob/master/docs/README-zh.md) | [文档手册](https://www.walle-web.io/docs/).
-
-Now, there are more than hundreds of companies hosted walle for deployment, star walle if you like : )
-
-* Support git/svn Version control system.
-* User signup by admin/develop identity.
-* Developer submit a task, deploy task.
-* Admin audit task.
-* Multiple project.
-* Multiple Task Parallel.
-* Quick rollback.
-* Group relation of project.
-* Task of pre-deploy（e.g: test ENV var）.
-* Task of post-deploy（e.g: mvn/ant, composer install for vendor）.
-* Task of pre-release（e.g: stop service）.
-* Task of post-release（e.g: restart service）.
-* Check up file md5.
-* Multi-process multi-server file transfer (Ansible).
+`2.0.0` 占用了我几乎所有业余时间，精力与金钱付出换各位使用收益，望各位喜欢不吝顺手 `star` 以示支持，项目更好亦反馈予你。目前 `2.0.0` 已经发布，请保持关注，我会在公众号更新（在最下面）。  
 
 
-Requirements
-------------
+有推广资源（开源文章推荐、大会分享）的同学，请微信联系我，强烈需要帮助。另外，老版本已迁移到 [walle 1.x](https://github.com/meolu/walle-web-v1.x) 的同学**务必不要再更新了**，两个版本不兼容
 
-* Bash(git、ssh)
-* LNMP/LAMP(php5.4+)
-* Composer
-* Ansible(Optional)
-
-That's all. It's base package of PHP environment!
-
-
-Installation
-------------
-```
-git clone git@github.com:meolu/walle-web.git
-cd walle-web
-vi config/local.php # set up module db mysql connection info
-composer install  # error cause by bower-asset, install：composer global require "fxp/composer-asset-plugin:*"
-./yii walle/setup # init walle
-```
-Or [The Most Detailed Installation Guide](https://github.com/meolu/walle-web/blob/master/docs/install-en.md), any questions refer to [FAQ](https://github.com/meolu/walle-web/blob/master/docs/faq-en.md)
-
-Quick Start
--------------
-
-* Signup a admin user(`admin/admin` exists), then configure a project, add member to the project, detect it.
-    * [git demo](https://github.com/meolu/walle-web/blob/master/docs/config-git-en.md)
-    * [svn demo](https://github.com/meolu/walle-web/blob/master/docs/config-svn-en.md)
-* Signup a develop user(`demo/demo` exists), submit a deployment.
-* Project admin audit the deployment.
-* Developer deploy the deployment.
-
-
-Custom
---------
-you would like to adjust some params to make walle suited for your company.
-
-* Set suffix of email while signing in
-    ```php
-    vi config/params.php
-
-    'mail-suffix'   => [  // specify the suffix of email, multiple suffixes are allow.
-        'huamanshu.com',  // e.g: allow xyz@huamanshu.com only
-    ]
-    ```
-
-* Configure email smtp
-    ```php
-    vi config/local.php
-
-    'transport' => [
-            'host'       => 'smtp.huamanshu.com',
-            'username'   => 'service@huamanshu.com',
-            'password'   => 'K84erUuxg1bHqrfD',
-            'port'       => 25,
-            'encryption' => 'tls',
-        ],
-        'messageConfig' => [
-            'charset' => 'UTF-8',
-            'from'    => ['service@huamanshu.com' => '花满树出品'], 
-        ],
-    ```
-
-* Configure the path for log
-    ```php
-    vi config/params.php
-
-    'log.dir'   => '/tmp/walle/',
-    ```
-
-* Configure language
-    ```php
-    vi config/local.php
-
-    'language'   => 'en',  // zh-CN => 中文,  en => English
-    ```
-
-
-To Do List
-----------
-
-- Travis CI integration
-- Mail events：specify kinds of events
-- Gray released：specify servers
-- Websocket instead of poll
-- A manager of static source
-- Configure variables
-- Support Docker
-- Open api
-- Command line
-
-Update
------------------
-```
-./yii walle/upgrade    # upgrade walle
-```
-
+Feature
+=========================
+- 类`gitlab`的`RESTful API`，类`gitlab`的权限模型。将来打通`gitlab`，良心的惊喜
+- 空间管理。意味着有独立的空间资源：环境管理、用户组、项目、服务器等
+- 灰度发布。呼声不断，终于来了
+- 项目管理。Deploy、Release的前置及后置hook，自定义全局变量；自带检测、复制功能，都贴心到这种程度了
+- `websocket` 实时展示部署中的 `shell console`，跟真的终端长得一样。
+- 完善的通知机制。邮件、钉钉
+- 全新的UI，我自己都被震憾到了，如丝般流畅
 
 Architecture
-------------
-#### git/svn, user, host, servers
-![](https://raw.github.com/meolu/docs/master/walle-web.io/docs/en/static/walle-flow-relation-en.png)
+=========================
+![](https://raw.github.com/meolu/docs/master/walle-web.io/docs/2/zh-cn/static/walle-flow-relation.jpg)
+![](https://raw.github.com/meolu/docs/master/walle-web.io/docs/2/zh-cn/static/permission.png)
 
-#### deployment flow
-![](https://raw.github.com/meolu/docs/master/walle-web.io/docs/en/static/walle-flow-en.png)
+Preview
+=========================
+![](https://raw.github.com/meolu/docs/master/walle-web.io/docs/2/zh-cn/static/user-list.png)
+![](https://raw.github.com/meolu/docs/master/walle-web.io/docs/2/zh-cn/static/project-list.png)
+![](https://raw.github.com/meolu/docs/master/walle-web.io/docs/2/zh-cn/static/task-list.png)
+![](https://raw.github.com/meolu/docs/master/walle-web.io/docs/2/zh-cn/static/deploy-console.png)
+![](https://raw.github.com/meolu/docs/master/walle-web.io/docs/2/zh-cn/static/project_java_tomcat.png)
 
-Screenshots
------------
+Installation
+=========================
+[快速安装](https://walle-web.io/docs/2/installation.html) | [安装错误](https://walle-web.io/docs/2/install-error.html) | [常见错误排解](https://walle-web.io/docs/2/troubleshooting.html)
 
-#### project config
-![](https://raw.github.com/meolu/docs/master/walle-web.io/docs/en/static/walle-config-edit-en.jpg)
-
-#### sumbit a task
-![](https://raw.github.com/meolu/docs/master/walle-web.io/docs/en/static/walle-submit-en.jpg)
-
-#### list of task
-![](https://raw.github.com/meolu/docs/master/walle-web.io/docs/en/static/walle-dev-list-en.jpg)
-
-#### demo show
-![](https://raw.github.com/meolu/docs/master/walle-web.io/docs/en/static/walle-en.gif)
-
-## CHANGELOG
-[CHANGELOG](https://github.com/meolu/walle-web/releases)
+Roadmap
+=========================
+- [x] **预览版**  2018-12-02
+    - ~~安装文档、前后端代码、Data Migration~~
+- [x] **Alpha** 2018-12-09
+    - ~~使用文档、Trouble Shooting、公众号更新~~
+- [x] **Beta** 2018-12-23 :santa:圣诞夜前夕
+    - ~~钉钉/邮件消息通知~~
+    - ~~接受官网logo企业的`Trouble Shooting`~~
+- [x] **2.0.0**  2018-12-30 :one:元旦前夕
+    - ~~项目检测、复制~~
+    - ~~任务的回滚~~
+    - ~~`released tag`、使用文档~~
+    - ~~`Docker` 镜像~~
+    - ~~Java配置模板~~
+    - ~~PHP配置模板~~
+    - ~~`github` 5000 `star`~~
+- [x] **2.0.1**  2019-01-13
+    - ~~项目配置添加自定义变量~~
+    - ~~Python 3.7+兼容~~
+- **2.0.2**  2019-01-20
+    - `Dashboard`（全新的玩法，欢迎提issue）
+    - 在线PPT介绍
+- **2.1.0**  2019-01-27 :new:新年版
+    - `CAS`
+    - 冲刺`github` 7000 `star`（靠你们和你们的同事们了）
 
 
 Discussing
-----------
+=========================
 - [submit issue](https://github.com/meolu/walle-web/issues/new)
-- email: wushuiyong@huamanshu.com
+
 
 勾搭下
---------
-人脉也是一项非常重要能力，请备注姓名@公司，谢谢：）
+=========================
+写开源是我的业余爱好，大数据平台和营销技术才是主业，无论哪个都欢迎交流。  
+人脉也是一项重要能力，请备注姓名@公司，谢谢：）
 
-<img src="https://raw.githubusercontent.com/meolu/walle-web/master/docs/weixin.wushuiyong.jpg" width="244" height="314" alt="吴水永微信" align=left />
+<img src="https://raw.githubusercontent.com/meolu/walle-web/master/screenshot/weixin-wushuiyong.jpg" width="244" height="314" alt="吴水永微信" align=left />
 
-<img src="https://raw.githubusercontent.com/meolu/walle-web/master/docs/yexinhao.jpeg" width="280" height="314" alt="叶歆昊微信" align=left />
+<img src="https://raw.githubusercontent.com/meolu/walle-web/master/screenshot/weixin-huakai.jpg" width="244" height="314" alt="花开微信" align=left />
 
-<img src="https://raw.githubusercontent.com/meolu/walle-web/master/docs/sunhenzhe.jpeg" width="244" height="314" alt="孙恒哲微信" align=left />
+<img src="https://raw.githubusercontent.com/meolu/walle-web/master/screenshot/weixin-ye.jpg" width="244" height="314" alt="叶歆昊微信" align=left />
 
+
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+新的惊喜
+=========================
+后续更新和解剖讨论、以及walle有趣的人和事，将会放到公众号：walle-web，晨间除了写开源，也会写千字文，关注不迷路：）
+
+<img src="https://raw.githubusercontent.com/meolu/walle-web/master/screenshot/wechat-gzh.jpg" width="244" height="314" alt="公众号 walle-web" />
+
+
+打赏作者杯咖啡
+=========================
+你也不一定要赞赏，芸芸众生，相遇相识是一种缘份。不过可以给点个star，或者关注公众号，哈
+
+<img src="https://raw.github.com/meolu/docs/master/walle-web.io/docs/2/zh-cn/static/appreciation-wechat.jpg" width="220" height="220" alt="赞赏码" style="float: left;"/>
+
+Code Visualization
+=========================
+感谢`gitviscode`组织制作的`commit history`视频，记录从15年萌芽发展，有那么多开发者加入完善。1'50的时候，以为项目都停止更新了，然后突然如烟花绽放的感觉，我他妈都感动得要哭了
+
+ [![Watch the video](https://img.youtube.com/vi/AIir52mETMY/0.jpg)](https://www.youtube.com/watch?v=AIir52mETMY)
+
+ [https://www.youtube.com/watch?v=AIir52mETMY](https://www.youtube.com/watch?v=AIir52mETMY)
